@@ -2,36 +2,36 @@
   {
     "login": "drth",
     "password": "1111",
-    "hints": 14,
-    "coins": 23,
+    "hints": 19,
+    "coins": 28,
     "recentGames": [
       {
         "result": "победа",
-        "word": "эмоциональность\r",
-        "timestamp": "2024-11-24T18:04:29.350Z"
+        "word": "delicate\r",
+        "timestamp": "2024-11-24T22:31:55.204Z"
       },
       {
         "result": "победа",
-        "word": "параллелепипед\r",
-        "timestamp": "2024-11-24T18:02:21.274Z"
+        "word": "благовоние\r",
+        "timestamp": "2024-11-24T22:31:40.000Z"
       },
       {
         "result": "победа",
-        "word": "акваланг\r",
-        "timestamp": "2024-11-24T18:01:58.195Z"
+        "word": "environmental\r",
+        "timestamp": "2024-11-24T22:31:11.503Z"
       },
       {
         "result": "победа",
-        "word": "гвоздика\r",
-        "timestamp": "2024-11-24T18:01:42.060Z"
+        "word": "rotate\r",
+        "timestamp": "2024-11-24T22:25:30.117Z"
       },
       {
-        "result": "победа",
-        "word": "авторизация\r",
-        "timestamp": "2024-11-24T14:19:36.724Z"
+        "result": "поражение",
+        "word": null,
+        "timestamp": "2024-11-24T22:15:11.720Z"
       }
     ],
-    "score": 13
+    "score": 35
   },
   {
     "login": "ghost",

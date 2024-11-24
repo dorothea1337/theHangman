@@ -32,7 +32,6 @@
             <img src="content/coin.png" class="coin-img">
         </div>
         <p class="switch-theme marg text-btn">Переключить тему</p>
-        <p class="switch-lang marg text-btn">Переключить язык</p>
         <p class="quit marg text-btn">Выйти</p>
     </div>
     <div class="leader-window">
@@ -180,7 +179,7 @@
         <div id="overlay" class="overlay hidden-victory">
             <div class="popup">
                 <div class="div-cross"><img class="cross" src="content/cross.png"></div>
-                <h2 class="h2">Победа!</h2>
+                <h2 class="h2 victory">Победа!</h2>
                 <div class="coins-inrease">
                     <p class="plus-one">+1</p>
                     <img src="content/coin.png">
@@ -192,7 +191,7 @@
         <div id="overlay-defeat" class="overlay hidden-defeat">
             <div class="popup">
                 <div class="div-cross"><img class="cross cross-1" src="content/cross.png"></div>
-                <h2 class="h2">Поражение...</h2>
+                <h2 class="h2 defeat">Поражение...</h2>
                 <p class="play-again" id="play-again-button-1">Сыграть ещё</p>
             </div>
         </div>
@@ -200,5 +199,6 @@
     <div class="overlay-background"></div>
 
     <script src="logic.js"></script>
+    <script src="translations.js"></script>
 </body>
 </html>

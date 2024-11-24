@@ -93,17 +93,28 @@ function updateHistoryWindow(recentGames) {
         document.getElementById(`recent-game-text-${i}`).textContent = '';
     }
 
-    // Заполняем поля данными из recentGames
     recentGames.reverse().forEach((game, index) => {
         const field = document.getElementById(`recent-game-text-${index + 1}`);
+        const savedLanguage = localStorage.getItem('language') || 'ru'; 
         if (field) {
             // Вставляем текст в поле
             if (typeof game === 'string') {
                 field.textContent = game; // Если просто "победа" или "поражение"
             } else if (game.result && game.word) {
-                field.textContent = `${game.result}: ${game.word}`;
+                if (savedLanguage === 'ru'){
+                    field.textContent = `${game.result}: ${game.word}`;
+                }
+                else{
+                    field.textContent = `victory: ${game.word}`;
+                }
             } else {
-                field.textContent = game.result;
+                if (savedLanguage === 'ru'){
+                    field.textContent = game.result;
+                }
+                else{
+                    field.textContent = `defeat`;
+                }
+                
             }
         }
     });
@@ -151,14 +162,19 @@ function loadLeaders() {
         })
         .then(leaders => {
             console.log('Полученные лидеры:', leaders); // Проверяем, что получили
-
+            const savedLanguage = localStorage.getItem('language') || 'ru'; 
             // Заполняем текстовые поля для каждого лидера
             for (let i = 1; i <= 5; i++) {
                 const leaderText = document.getElementById(`leader-text-${i}`);
                 if (leaderText) {
                     if (leaders[i - 1]) {
                         const leader = leaders[i - 1];
-                        leaderText.textContent = `${i}. ${leader.login}, очки: ${leader.score}`;
+                        if (savedLanguage === 'ru'){
+                            leaderText.textContent = `${i}. ${leader.login}, очки: ${leader.score}`;
+                        }
+                        else{
+                            leaderText.textContent = `${i}. ${leader.login}, score: ${leader.score}`;
+                        }
                     } else {
                         leaderText.textContent = ''; // Очищаем поле, если лидера нет
                     }

@@ -22,6 +22,10 @@ const wordsLightRuPath = path.join(__dirname, 'words-light-ru.txt');
 const wordsMediumRuPath = path.join(__dirname, 'words-medium-ru.txt');
 const wordsHardRuPath = path.join(__dirname, 'words-hard-ru.txt');
 
+const wordsLightEnPath = path.join(__dirname, 'words-light-en.txt');
+const wordsMediumEnPath = path.join(__dirname, 'words-medium-en.txt');
+const wordsHardEnPath = path.join(__dirname, 'words-hard-en.txt');
+
 const usersFilePath = path.join(__dirname, 'users.json');
 const leadersFilePath = path.join(__dirname, 'leaders.json');
 
@@ -232,19 +236,41 @@ app.get('/login', (req, res) => {
 //===============================СИСТЕМА ГЕНЕРАЦИИ СЛОВА==================================
 
 
+// Обработчик запроса на случайное слово
 app.get('/random-word', (req, res) => {
-    const difficulty = req.query.difficulty; // Получаем уровень сложности из запроса
+    const difficulty = req.query.difficulty; // Получаем уровень сложности
+    const language = req.query.language; // Получаем язык
+
+    // Проверяем, если язык не задан, по умолчанию ставим русский
+    if (!language) {
+        return res.status(400).send('Language is required');
+    }
+
     let filePath;
 
-    // Определяем, какой файл использовать
-    if (difficulty === 'light') {
-        filePath = wordsLightRuPath;
-    } else if (difficulty === 'medium') {
-        filePath = wordsMediumRuPath;
-    } else if (difficulty === 'hard') {
-        filePath = wordsHardRuPath;
+    // Определяем, какой файл использовать в зависимости от языка и сложности
+    if (language === 'ru') {
+        if (difficulty === 'light') {
+            filePath = wordsLightRuPath;
+        } else if (difficulty === 'medium') {
+            filePath = wordsMediumRuPath;
+        } else if (difficulty === 'hard') {
+            filePath = wordsHardRuPath;
+        } else {
+            return res.status(400).send('Invalid difficulty level');
+        }
+    } else if (language === 'en') {
+        if (difficulty === 'light') {
+            filePath = wordsLightEnPath;
+        } else if (difficulty === 'medium') {
+            filePath = wordsMediumEnPath;
+        } else if (difficulty === 'hard') {
+            filePath = wordsHardEnPath;
+        } else {
+            return res.status(400).send('Invalid difficulty level');
+        }
     } else {
-        return res.status(400).send('Invalid difficulty level');
+        return res.status(400).send('Invalid language');
     }
 
     fs.readFile(filePath, 'utf8', (err, data) => {
@@ -254,10 +280,11 @@ app.get('/random-word', (req, res) => {
         const words = data.split('\n').filter(word => word.trim().length > 0);
         const randomIndex = Math.floor(Math.random() * words.length);
         const randomWord = words[randomIndex];
-        console.log(`Случайное слово (${difficulty}):`, randomWord);
+        console.log(`Случайное слово (${language}-${difficulty}):`, randomWord);
         res.send(randomWord);
     });
 });
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
