@@ -23,9 +23,36 @@ const wordsMediumRuPath = path.join(__dirname, 'words-medium-ru.txt');
 const wordsHardRuPath = path.join(__dirname, 'words-hard-ru.txt');
 
 const usersFilePath = path.join(__dirname, 'users.json');
+const leadersFilePath = path.join(__dirname, 'leaders.json');
 
 
 //=======================================СИСТЕМА АККАУНТОВ===============================
+
+// Регистрация
+app.post('/register', (req, res) => {
+    const { login, password } = req.body;
+
+    const users = readUsers();
+    const userExists = users.some(u => u.login === login);
+
+    if (userExists) {
+        return res.status(400).send('User already exists');
+    }
+
+    const newUser = {
+        login,
+        password,
+        hints: 3, // Начальные подсказки
+        coins: 2,  // Начальные монеты
+        recentGames: [], 
+        score: 0
+    };
+
+    users.push(newUser);
+    writeUsers(users);
+    return res.status(201).send('Registration successful');
+});
+updateUserStructure();
 
 app.get('/users.json', (req, res) => {
     const filePath = path.join(__dirname, 'users.json');
@@ -93,6 +120,23 @@ app.post('/update-user-data', (req, res) => {
     });
 });
 
+app.get('/leaders', (req, res) => {
+    fs.readFile(leadersFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Ошибка при чтении leaders.json:', err);
+            return res.status(500).json({ error: 'Не удалось загрузить список лидеров' });
+        }
+
+        try {
+            const leaders = JSON.parse(data);
+            res.json(leaders); // Отправляем содержимое файла клиенту
+        } catch (parseError) {
+            console.error('Ошибка при разборе JSON из leaders.json:', parseError);
+            res.status(500).json({ error: 'Ошибка при разборе списка лидеров' });
+        }
+    });
+});
+
 
 // Вход
 app.post('/login', (req, res) => {
@@ -123,31 +167,46 @@ app.get('/current-user', (req, res) => {
     res.json({ currentLogin: req.session.currentLogin });
 });
 
+function updateLeadersFile() {
+    // Чтение файла users.json
+    fs.readFile(usersFilePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Ошибка при чтении users.json:', err);
+            return;
+        }
 
-// Регистрация
-app.post('/register', (req, res) => {
-    const { login, password } = req.body;
+        let users;
+        try {
+            users = JSON.parse(data); // Парсим содержимое users.json
+        } catch (parseError) {
+            console.error('Ошибка при разборе JSON из users.json:', parseError);
+            return;
+        }
 
-    const users = readUsers();
-    const userExists = users.some(u => u.login === login);
+        // Формируем список лидеров: { login, score }
+        const leaders = users
+            .map(user => ({
+                login: user.login,
+                score: user.score || 0, // Учитываем, что score может отсутствовать
+            }))
+            .sort((a, b) => b.score - a.score); // Сортировка по убыванию score
 
-    if (userExists) {
-        return res.status(400).send('User already exists');
-    }
+        // Запись отсортированных лидеров в leaders.json
+        fs.writeFile(leadersFilePath, JSON.stringify(leaders, null, 2), 'utf8', writeErr => {
+            if (writeErr) {
+                console.error('Ошибка при записи в leaders.json:', writeErr);
+            } else {
+                console.log('leaders.json успешно обновлен.');
+            }
+        });
+    });
+}
 
-    const newUser = {
-        login,
-        password,
-        hints: 3, // Начальные подсказки
-        coins: 2,  // Начальные монеты
-        recentGames: []
-    };
+// Устанавливаем интервал для обновления файла раз в 10 секунд
+setInterval(updateLeadersFile, 10000);
 
-    users.push(newUser);
-    writeUsers(users);
-    return res.status(201).send('Registration successful');
-});
-updateUserStructure();
+// Запускаем первое обновление при старте сервера
+updateLeadersFile();
 
 app.post('/logout', (req, res) => {
     console.log('Запрос на выход получен');
@@ -242,7 +301,7 @@ app.post('/use-hint', (req, res) => {
 });
 
 app.post('/update-user-rewards', (req, res) => {
-    const { login, hints, coins } = req.body;
+    const { login, hints, coins, score } = req.body;
 
     const users = readUsers();
     const user = users.find(u => u.login === login);
@@ -250,6 +309,7 @@ app.post('/update-user-rewards', (req, res) => {
     if (user) {
         user.hints = hints;
         user.coins = coins;
+        user.score = score;
         writeUsers(users);
         res.status(200).json({ message: 'Rewards updated successfully' });
     } else {

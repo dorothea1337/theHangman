@@ -113,3 +113,76 @@ function updateHistoryWindow(recentGames) {
 window.addEventListener('DOMContentLoaded', () => {
     loadRecentGames();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Index page script loaded'); // Проверим, что скрипт запускается на нужной странице
+
+    const leaderIcon = document.querySelector('.header-button.leader1');
+    const leaderWindow = document.querySelector('.leader-window-1');
+    const overlayBackground = document.querySelector('.overlay-background-1');
+
+    if (leaderIcon && leaderWindow && overlayBackground) {
+        console.log('Elements found on index.html'); // Проверим, что элементы найдены
+        leaderIcon.addEventListener('click', () => {
+            console.log('leader icon clicked'); // Логируем клик
+            leaderWindow.classList.toggle('active');
+            overlayBackground.classList.toggle('active');
+            loadLeaders();
+        });
+
+        overlayBackground.addEventListener('click', () => {
+            console.log('Overlay clicked'); // Логируем клик по overlay
+            leaderWindow.classList.remove('active');
+            overlayBackground.classList.remove('active');
+        });
+    } else {
+        console.log('leader elements not found on index.html');
+    }
+});
+
+function loadLeaders() {
+    console.log('Загрузка списка лидеров...');
+    fetch('/leaders')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Не удалось загрузить список лидеров');
+            }
+            return response.json();
+        })
+        .then(leaders => {
+            console.log('Полученные лидеры:', leaders); // Проверяем, что получили
+
+            // Заполняем текстовые поля для каждого лидера
+            for (let i = 1; i <= 5; i++) {
+                const leaderText = document.getElementById(`leader-text-${i}`);
+                if (leaderText) {
+                    if (leaders[i - 1]) {
+                        const leader = leaders[i - 1];
+                        leaderText.textContent = `${i}. ${leader.login}, очки: ${leader.score}`;
+                    } else {
+                        leaderText.textContent = ''; // Очищаем поле, если лидера нет
+                    }
+                } else {
+                    console.warn(`Элемент leader-text-${i} не найден`);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке списка лидеров:', error);
+        });
+}
+
+
+// Загружаем список лидеров при открытии окна
+document.addEventListener('DOMContentLoaded', () => {
+    const leaderIcon = document.querySelector('.header-button.leader1');
+    const leaderWindow = document.querySelector('.leader-window-1');
+
+    if (leaderIcon && leaderWindow) {
+        leaderIcon.addEventListener('click', () => {
+            if (!leaderWindow.classList.contains('active')) {
+                loadLeaders(); // Обновляем список лидеров при открытии окна
+            }
+        });
+    }
+});

@@ -624,10 +624,10 @@ function showVictoryPopup() {
     const arrowButton = document.querySelector('.arrow');
     if (arrowButton) {
         arrowButton.classList.remove('hidden-arrow'); // Убираем класс hidden
-    } 
-    
-    const nav =document.querySelector('.nav');
-    if (nav){
+    }
+
+    const nav = document.querySelector('.nav');
+    if (nav) {
         nav.style.justifyContent = 'space-between';
     }
 
@@ -636,20 +636,44 @@ function showVictoryPopup() {
         currentUser.hints = (currentUser.hints || 0) + 1; // Увеличиваем подсказки
         currentUser.coins = (currentUser.coins || 0) + 1; // Увеличиваем монеты
 
+        // Получаем уровень сложности из локального хранилища
+        const difficulty = localStorage.getItem('currentDifficulty') || 'light';
+
+        // Начисляем очки в зависимости от уровня сложности
+        let points = 0;
+        if (difficulty === 'light') {
+            points = 1;
+        } else if (difficulty === 'medium') {
+            points = 5;
+        } else if (difficulty === 'hard') {
+            points = 10;
+        }
+        currentUser.score = (currentUser.score || 0) + points; // Увеличиваем очки
+
         // Обновляем отображение на странице
         updateHints(currentUser.hints);
         updateCoins(currentUser.coins);
+        //updateScore(currentUser.score); // Функция для обновления отображения очков
 
-        console.log('Начислено: 1 подсказка и 1 монета. Текущее состояние:');
-        console.log('Подсказки:', currentUser.hints, 'Монеты:', currentUser.coins);
+        console.log(`Начислено: 1 подсказка, 1 монета и ${points} очков за уровень "${difficulty}".`);
+        console.log('Текущее состояние:', {
+            hints: currentUser.hints,
+            coins: currentUser.coins,
+            score: currentUser.score,
+        });
 
-        // Сохраняем изменения на сервере (если необходимо)
+        // Сохраняем изменения на сервере
         fetch('/update-user-rewards', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ login: currentUser.login, hints: currentUser.hints, coins: currentUser.coins }),
+            body: JSON.stringify({
+                login: currentUser.login,
+                hints: currentUser.hints,
+                coins: currentUser.coins,
+                score: currentUser.score,
+            }),
         })
             .then(response => {
                 if (response.ok) {
@@ -662,13 +686,15 @@ function showVictoryPopup() {
                 console.error('Ошибка сети при сохранении начислений:', error);
             });
 
+        // Добавляем результат игры в историю пользователя
         const word = localStorage.getItem('randomWord') || 'неизвестно'; // Загаданное слово
         addGameResultToUser('победа', word);
         loadRecentGames();
     } else {
-        console.warn('Текущий пользователь не найден. Невозможно начислить подсказки и монеты.');
+        console.warn('Текущий пользователь не найден. Невозможно начислить подсказки, монеты и очки.');
     }
 }
+
 
 function resetGame() {
     clearGameState();
@@ -832,4 +858,75 @@ window.addEventListener('DOMContentLoaded', () => {
     loadRecentGames();
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Index page script loaded'); // Проверим, что скрипт запускается на нужной странице
 
+    const leaderIcon = document.querySelector('.header-button.leader');
+    const leaderWindow = document.querySelector('.leader-window');
+    const overlayBackground = document.querySelector('.overlay-background');
+
+    if (leaderIcon && leaderWindow && overlayBackground) {
+        console.log('Elements found on index.html'); // Проверим, что элементы найдены
+        leaderIcon.addEventListener('click', () => {
+            console.log('leader icon clicked'); // Логируем клик
+            leaderWindow.classList.toggle('active');
+            overlayBackground.classList.toggle('active');
+            loadLeaders();
+        });
+
+        overlayBackground.addEventListener('click', () => {
+            console.log('Overlay clicked'); // Логируем клик по overlay
+            leaderWindow.classList.remove('active');
+            overlayBackground.classList.remove('active');
+        });
+    } else {
+        console.log('leader elements not found on index.html');
+    }
+});
+
+function loadLeaders() {
+    console.log('Загрузка списка лидеров...');
+    fetch('/leaders')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Не удалось загрузить список лидеров');
+            }
+            return response.json();
+        })
+        .then(leaders => {
+            console.log('Полученные лидеры:', leaders); // Проверяем, что получили
+
+            // Заполняем текстовые поля для каждого лидера
+            for (let i = 1; i <= 5; i++) {
+                const leaderText = document.getElementById(`leader-text-${i}`);
+                if (leaderText) {
+                    if (leaders[i - 1]) {
+                        const leader = leaders[i - 1];
+                        leaderText.textContent = `${i}. ${leader.login}, очки: ${leader.score}`;
+                    } else {
+                        leaderText.textContent = ''; // Очищаем поле, если лидера нет
+                    }
+                } else {
+                    console.warn(`Элемент leader-text-${i} не найден`);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке списка лидеров:', error);
+        });
+}
+
+
+// Загружаем список лидеров при открытии окна
+document.addEventListener('DOMContentLoaded', () => {
+    const leaderIcon = document.querySelector('.header-button.leader');
+    const leaderWindow = document.querySelector('.leader-window');
+
+    if (leaderIcon && leaderWindow) {
+        leaderIcon.addEventListener('click', () => {
+            if (!leaderWindow.classList.contains('active')) {
+                loadLeaders(); // Обновляем список лидеров при открытии окна
+            }
+        });
+    }
+});

@@ -2,55 +2,65 @@
   {
     "login": "drth",
     "password": "1111",
-    "hints": 10,
-    "coins": 19,
+    "hints": 14,
+    "coins": 23,
     "recentGames": [
+      {
+        "result": "победа",
+        "word": "эмоциональность\r",
+        "timestamp": "2024-11-24T18:04:29.350Z"
+      },
+      {
+        "result": "победа",
+        "word": "параллелепипед\r",
+        "timestamp": "2024-11-24T18:02:21.274Z"
+      },
+      {
+        "result": "победа",
+        "word": "акваланг\r",
+        "timestamp": "2024-11-24T18:01:58.195Z"
+      },
+      {
+        "result": "победа",
+        "word": "гвоздика\r",
+        "timestamp": "2024-11-24T18:01:42.060Z"
+      },
       {
         "result": "победа",
         "word": "авторизация\r",
         "timestamp": "2024-11-24T14:19:36.724Z"
-      },
-      {
-        "result": "победа",
-        "word": "табличка\r",
-        "timestamp": "2024-11-24T14:19:13.601Z"
-      },
-      {
-        "result": "победа",
-        "word": "ефрейтор\r",
-        "timestamp": "2024-11-24T14:01:57.139Z"
-      },
-      {
-        "result": "поражение",
-        "word": null,
-        "timestamp": "2024-11-24T14:01:32.053Z"
-      },
-      {
-        "result": "победа",
-        "word": "звездоцвет\r",
-        "timestamp": "2024-11-24T13:58:28.905Z"
       }
-    ]
+    ],
+    "score": 13
   },
   {
     "login": "ghost",
     "password": "0000",
     "hints": 2,
     "coins": 1,
-    "recentGames": []
+    "recentGames": [],
+    "score": 1
   },
   {
     "login": "1",
     "password": "1",
     "hints": 3,
     "coins": 2,
-    "recentGames": []
+    "recentGames": [],
+    "score": 8
   },
   {
-    "login": "Й",
-    "password": "Й",
-    "hints": 3,
-    "coins": 2,
-    "recentGames": []
+    "login": "qwerty",
+    "password": "qwerty",
+    "hints": 4,
+    "coins": 3,
+    "recentGames": [
+      {
+        "result": "победа",
+        "word": "преувеличивать\r",
+        "timestamp": "2024-11-24T18:22:44.407Z"
+      }
+    ],
+    "score": 10
   }
 ]
