@@ -1,0 +1,26 @@
+[
+  {
+    "login": "drth",
+    "password": "1111",
+    "hints": 0,
+    "coins": 3
+  },
+  {
+    "login": "ghost",
+    "password": "0000",
+    "hints": 2,
+    "coins": 1
+  },
+  {
+    "login": "qwerty",
+    "password": "qwerty",
+    "hints": 3,
+    "coins": 2
+  },
+  {
+    "login": "1",
+    "password": "1",
+    "hints": 3,
+    "coins": 2
+  }
+]

@@ -1,0 +1,62 @@
+@font-face {
+    font-family: "Melectron";
+    src: local("/fonts/");
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.h1 {
+    font-family: "Melectron";
+    font-size: 150px;
+    margin: 0;
+}
+
+p {
+    font-family: 'Nunito', sans-serif;
+}
+
+.entry-box{
+    margin: 40px auto;
+}
+
+.login-box{
+    margin-bottom: 15px;
+}
+
+label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+}
+
+input {
+    width: 700px;
+    height: 40px;
+}
+
+.buttons-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.enter {
+    font-size: 40px;
+    margin-bottom: 0;
+}
+
+.register {
+    font-size: 36px;
+}
+
+.button{
+    cursor: pointer;
+}
+
+.button:hover{
+    color: #757272;
+}

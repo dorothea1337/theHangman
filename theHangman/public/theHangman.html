@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Виселица</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <img src="content/leaders.svg" class="header-button leader-table">
+        <h1 class="h1">Виселица</h1>
+        <div class="header-right">
+            <img src="content/history.svg" class="header-button history">
+            <img src="content/profile.svg" class="header-button profile">
+        </div>
+    </div>
+    <div class="profile-window">
+        <div class="username-box marg">
+            <p class="username-def">Имя пользователя: </p>
+            <p class="username"></p>
+        </div>
+        <div class="hints-box marg">
+            <p class="hints-def">Подсказки:</p>
+            <p class="hints"></p>
+        </div>
+        <div class="coins-box marg">
+            <p class="coins-def">Монетки:</p>
+            <p class="coins-p"></p>
+            <img src="content/coin.png" class="coin-img">
+        </div>
+        <p class="switch-theme marg text-btn">Переключить тему</p>
+        <p class="switch-lang marg text-btn">Переключить язык</p>
+        <p class="quit marg text-btn">Выйти</p>
+    </div>
+    <div class="nav">
+        <img class="header-button arrow hidden-arrow" src="content/arrow.svg">
+        <div class="coins">
+            <p class="coins-left coins-p"></p>
+            <img class="coin-icon" src="content/coin.png">
+        </div>
+    </div>
+    <div class="body">
+        <div class="hang-box">
+            <img src="content/theHang.png" class="hang-img" id="hang-img">
+            <div class="bro-person">
+                <img src="content/head.png" class="bro-head bro-hidden" id="bro-head">
+                <img src="content/body.png" class="bro-body bro-hidden" id="bro-body">
+                <img src="content/leftHand.png" class="bro-left-hand bro-hidden" id="bro-left-hand">
+                <img src="content/rightHand.png" class="bro-right-hand bro-hidden" id="bro-right-hand">
+                <img src="content/leftLeg.png" class="bro-left-leg bro-hidden" id="bro-left-leg">
+                <img src="content/rightLeg.png" class="bro-right-leg bro-hidden" id="bro-right-leg">
+            </div>
+        </div>
+        <div class="playground">
+            <div id="fields" class="flds"></div>
+            <div class="playground-letters">
+            <p class="used-letters-hello">Использованные буквы:</p>
+            <div class="russian-letters">
+                <div class="russian row row-1">
+                    <div class="letter-button"><p class="letter">А</p></div> 
+                    <div class="letter-button"><p class="letter">Б</p></div>
+                    <div class="letter-button"><p class="letter">В</p></div>
+                    <div class="letter-button"><p class="letter">Г</p></div>
+                    <div class="letter-button"><p class="letter">Д</p></div>
+                    <div class="letter-button"><p class="letter">Е</p></div>
+                    <div class="letter-button"><p class="letter">Ё</p></div>
+                    <div class="letter-button"><p class="letter">Ж</p></div>
+                    <div class="letter-button"><p class="letter">З</p></div>
+                    <div class="letter-button"><p class="letter">И</p></div>
+                    <div class="letter-button last-letter"><p class="letter">Й</p></div>
+                </div>
+                <div class="russian row row-2">
+                    <div class="letter-button"><p class="letter">К</p></div> 
+                    <div class="letter-button"><p class="letter">Л</p></div>
+                    <div class="letter-button"><p class="letter">М</p></div>
+                    <div class="letter-button"><p class="letter">Н</p></div>
+                    <div class="letter-button"><p class="letter">О</p></div>
+                    <div class="letter-button"><p class="letter">П</p></div>
+                    <div class="letter-button"><p class="letter">Р</p></div>
+                    <div class="letter-button"><p class="letter">С</p></div>
+                    <div class="letter-button"><p class="letter">Т</p></div>
+                    <div class="letter-button"><p class="letter">У</p></div>
+                    <div class="letter-button last-letter"><p class="letter">Ф</p></div>
+                </div>
+                <div class="russian row row-3">
+                    <div class="letter-button"><p class="letter">Х</p></div> 
+                    <div class="letter-button"><p class="letter">Ц</p></div>
+                    <div class="letter-button"><p class="letter">Ч</p></div>
+                    <div class="letter-button"><p class="letter">Ш</p></div>
+                    <div class="letter-button"><p class="letter">Щ</p></div>
+                    <div class="letter-button"><p class="letter">Ъ</p></div>
+                    <div class="letter-button"><p class="letter">Ы</p></div>
+                    <div class="letter-button"><p class="letter">Ь</p></div>
+                    <div class="letter-button"><p class="letter">Э</p></div>
+                    <div class="letter-button"><p class="letter">Ю</p></div>
+                    <div class="letter-button last-letter"><p class="letter">Я</p></div>
+                </div>
+            </div>
+            <div class="english-letters">
+                <div class="english row row-1">
+                    <div class="letter-button"><p class="letter">A</p></div> 
+                    <div class="letter-button"><p class="letter">B</p></div>
+                    <div class="letter-button"><p class="letter">C</p></div>
+                    <div class="letter-button"><p class="letter">D</p></div>
+                    <div class="letter-button"><p class="letter">E</p></div>
+                    <div class="letter-button"><p class="letter">F</p></div>
+                    <div class="letter-button"><p class="letter">G</p></div>
+                    <div class="letter-button"><p class="letter">H</p></div>
+                    <div class="letter-button"><p class="letter">I</p></div>
+                    <div class="letter-button"><p class="letter">J</p></div>
+                    <div class="letter-button last-letter"><p class="letter">K</p></div>
+                </div>
+                <div class="english row row-2">
+                    <div class="letter-button"><p class="letter">L</p></div> 
+                    <div class="letter-button"><p class="letter">M</p></div>
+                    <div class="letter-button"><p class="letter">N</p></div>
+                    <div class="letter-button"><p class="letter">O</p></div>
+                    <div class="letter-button"><p class="letter">P</p></div>
+                    <div class="letter-button"><p class="letter">Q</p></div>
+                    <div class="letter-button"><p class="letter">R</p></div>
+                    <div class="letter-button"><p class="letter">S</p></div>
+                    <div class="letter-button"><p class="letter">T</p></div>
+                    <div class="letter-button"><p class="letter">U</p></div>
+                    <div class="letter-button last-letter"><p class="letter">V</p></div>
+                </div>
+                <div class="english-row-3 row">
+                    <div class="letter-button"><p class="letter">W</p></div> 
+                    <div class="letter-button"><p class="letter">X</p></div>
+                    <div class="letter-button"><p class="letter">Y</p></div>
+                    <div class="letter-button"><p class="letter">Z</p></div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <div class="hintbox">
+            <div class="hints-left-box">
+                <p class="hints-left">Подсказки: </p>
+                <p class="number-hints-left hints"></p>
+            </div>
+            <p class="use-hint">Взять подсказку</p>
+        </div>
+
+        <div id="overlay" class="overlay hidden-victory">
+            <div class="popup">
+                <div class="div-cross"><img class="cross" src="content/cross.png"></div>
+                <h2 class="h2">Победа!</h2>
+                <div class="coins-inrease">
+                    <p class="plus-one">+1</p>
+                    <img src="content/coin.png">
+                </div>
+                <p class="play-again" id="play-again-button">Сыграть ещё</p>
+            </div>
+        </div>
+
+        <div id="overlay-defeat" class="overlay hidden-defeat">
+            <div class="popup">
+                <div class="div-cross"><img class="cross cross-1" src="content/cross.png"></div>
+                <h2 class="h2">Поражение...</h2>
+                <p class="play-again" id="play-again-button-1">Сыграть ещё</p>
+            </div>
+        </div>
+    </div>
+    <div class="overlay-background"></div>
+
+    <script src="logic.js"></script>
+</body>
+</html>

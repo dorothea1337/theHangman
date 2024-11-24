@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Виселица</title>
+  <link rel="stylesheet" href="style2.css" />
+</head>
+<body>
+    <div class="body">
+        <h1 class="h1">Виселица</h1>
+        <div class="entry-box">
+            <div class="login-box">
+                <label for="login-input">Логин</label><br>
+                <input type="text" id="login-input" name="login-input" style="font-family: 'Nunito', sans-serif; font-size: 30px;">
+            </div>
+            <div class="password-box">
+                <label for="password-input">Пароль</label><br>
+                <input type="password" id="password-input" name="password-input" style="font-family: 'Nunito', sans-serif; font-size: 30px;">
+            </div>
+        </div>
+        <div class="buttons-box">
+            <p class="enter button" onclick="login()">Войти</p>
+            <p class="register button" onclick="register()">Зарегистрироваться</p>
+        </div>
+    </div>
+    <p id="status-message"></p>
+    <script>
+        async function login() {
+            const login = document.getElementById('login-input').value;
+            const password = document.getElementById('password-input').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ login, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/index'; // Перенаправление на index.html
+                } else {
+                    const errorMessage = await response.text();
+                    document.getElementById('status-message').textContent = errorMessage;
+                }
+            } catch (error) {
+                console.error('Ошибка входа:', error);
+                document.getElementById('status-message').textContent = 'Ошибка сервера. Попробуйте позже.';
+            }
+        }
+
+        async function register() {
+            const login = document.getElementById('login-input').value;
+            const password = document.getElementById('password-input').value;
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ login, password })
+                });
+
+                if (response.ok) {
+                    window.location.href = '/index'; // Перенаправление на index.html
+                } else {
+                    const errorMessage = await response.text();
+                    document.getElementById('status-message').textContent = errorMessage;
+                }
+            } catch (error) {
+                console.error('Ошибка регистрации:', error);
+                document.getElementById('status-message').textContent = 'Ошибка сервера. Попробуйте позже.';
+            }
+        }
+    </script>
+</body>
+</html>
