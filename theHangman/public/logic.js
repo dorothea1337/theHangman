@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 console.log('Пользователь вышел успешно');
+                clearGameState();
                 // Перенаправляем на страницу входа
                 window.location.href = '/login';
             } else {
@@ -174,29 +175,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const mediumButton = document.getElementById('get-word-medium');
     const hardButton = document.getElementById('get-word-hard');
 
-    const handleDifficultyChange = (difficulty) => {
-        const savedState = loadGameState(); // Проверяем состояние игры
-        if (savedState) {
-            console.log('Уже есть незаконченная игра, новое слово не будет сгенерировано.');
-            return; // Если есть сохранённое состояние, выходим из функции
-        }
-
-        localStorage.setItem('currentDifficulty', difficulty); // Сохраняем уровень сложности
-        fetchRandomWord(difficulty); // Генерируем новое слово
-    };
-
     if (lightButton) {
-        lightButton.addEventListener('click', () => handleDifficultyChange('light'));
+        lightButton.addEventListener('click', () => {
+            localStorage.setItem('currentDifficulty', 'light'); // Сохраняем уровень
+            fetchRandomWord('light');
+        });
     }
     if (mediumButton) {
-        mediumButton.addEventListener('click', () => handleDifficultyChange('medium'));
+        mediumButton.addEventListener('click', () => {
+            localStorage.setItem('currentDifficulty', 'medium'); // Сохраняем уровень
+            fetchRandomWord('medium');
+        });
     }
     if (hardButton) {
-        hardButton.addEventListener('click', () => handleDifficultyChange('hard'));
+        hardButton.addEventListener('click', () => {
+            localStorage.setItem('currentDifficulty', 'hard'); // Сохраняем уровень
+            fetchRandomWord('hard');
+        });
     }
 });
-
-
 
 document.addEventListener('DOMContentLoaded', () => {
     const fieldsContainer = document.getElementById('fields');
@@ -385,27 +382,65 @@ function handleLetterClick(letter, word, button) {
 const bodyParts = ['bro-head', 'bro-body', 'bro-left-hand', 'bro-right-hand', 'bro-left-leg', 'bro-right-leg'];
 let errorCount = 0; // Счётчик ошибок
 
+function loadErrorState() {
+    const errorState = localStorage.getItem('errorState');
+    return errorState ? JSON.parse(errorState) : { errorCount: 0, displayedParts: [] };
+}
+
+function saveErrorState(errorCount, displayedParts) {
+    const errorState = { errorCount, displayedParts };
+    localStorage.setItem('errorState', JSON.stringify(errorState));
+}
+
+function initializeErrorState() {
+    const { errorCount: savedErrorCount, displayedParts } = loadErrorState();
+    errorCount = savedErrorCount;
+
+    displayedParts.forEach(partId => {
+        const part = document.getElementById(partId);
+        if (part) {
+            part.classList.add('bro-visible');
+        }
+    });
+
+    // Если были ошибки, обновляем изображение виселицы
+    const hangImage = document.getElementById('hang-img');
+    if (errorCount > 0 && hangImage) {
+        hangImage.src = './content/theHangEmpty.png';
+        console.log('Изображение виселицы обновлено на theHangEmpty.png');
+    }
+}
+
 function showNextBodyPart() {
     const hangImage = document.getElementById('hang-img'); // Элемент изображения виселицы
 
     if (errorCount < bodyParts.length) {
-        if (errorCount == 0 && hangImage) {
+        if (errorCount === 0 && hangImage) {
             hangImage.src = './content/theHangEmpty.png'; // Заменяем изображение виселицы
             console.log('Изображение виселицы обновлено на theHangEmpty.png');
         }
 
-        const part = document.getElementById(bodyParts[errorCount]);
-        part.classList.add('bro-visible'); // Показываем следующую часть
-        errorCount++;
+        const partId = bodyParts[errorCount];
+        const part = document.getElementById(partId);
 
-        if (errorCount == 6 && hangImage){
-        showGameOverPopup();
+        if (part) {
+            part.classList.add('bro-visible'); // Показываем следующую часть
+            errorCount++;
+            saveErrorState(errorCount, bodyParts.slice(0, errorCount)); // Сохраняем состояние ошибок
         }
-    } 
+
+        if (errorCount === 6 && hangImage) {
+            showGameOverPopup();
+        }
+    }
 }
+
+// Инициализация состояния игры
+document.addEventListener('DOMContentLoaded', initializeErrorState);
 
 function clearGameState() {
     localStorage.removeItem('gameState');
+    localStorage.removeItem('errorState')
 }
 
 function isWordGuessed() {
