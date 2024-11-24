@@ -2,25 +2,55 @@
   {
     "login": "drth",
     "password": "1111",
-    "hints": 0,
-    "coins": 9
+    "hints": 10,
+    "coins": 19,
+    "recentGames": [
+      {
+        "result": "победа",
+        "word": "авторизация\r",
+        "timestamp": "2024-11-24T14:19:36.724Z"
+      },
+      {
+        "result": "победа",
+        "word": "табличка\r",
+        "timestamp": "2024-11-24T14:19:13.601Z"
+      },
+      {
+        "result": "победа",
+        "word": "ефрейтор\r",
+        "timestamp": "2024-11-24T14:01:57.139Z"
+      },
+      {
+        "result": "поражение",
+        "word": null,
+        "timestamp": "2024-11-24T14:01:32.053Z"
+      },
+      {
+        "result": "победа",
+        "word": "звездоцвет\r",
+        "timestamp": "2024-11-24T13:58:28.905Z"
+      }
+    ]
   },
   {
     "login": "ghost",
     "password": "0000",
     "hints": 2,
-    "coins": 1
-  },
-  {
-    "login": "qwerty",
-    "password": "qwerty",
-    "hints": 3,
-    "coins": 2
+    "coins": 1,
+    "recentGames": []
   },
   {
     "login": "1",
     "password": "1",
     "hints": 3,
-    "coins": 2
+    "coins": 2,
+    "recentGames": []
+  },
+  {
+    "login": "Й",
+    "password": "Й",
+    "hints": 3,
+    "coins": 2,
+    "recentGames": []
   }
 ]

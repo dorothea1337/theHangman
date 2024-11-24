@@ -110,6 +110,43 @@ body {
     margin: 0;
 }
 
+.history-window-1{
+    width: 300px;
+    height: 300px;
+    margin: 0;
+    border: 1px solid black;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    background-color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 24px;
+    padding: 15px;
+    padding-top: 0;
+    flex-direction: column;
+    justify-content: space-around;
+
+    position: absolute;
+    top: 10%;
+    right: 10%;
+    z-index: 10;
+    display: none;
+}
+
+.history-window-1.active {
+    display: flex;
+}
+
+.recent-game{
+    border-bottom: 1px solid black;
+    height: 60px;
+}
+
+.recent-game-text {
+    white-space: nowrap; /* Запрещаем перенос строк */
+    overflow: hidden; /* Скрыть содержимое, если оно выходит за пределы */
+    text-overflow: ellipsis; /*Добавляем многоточие, если текст не помещается */
+}
+
 .text-btn {
     cursor: pointer;
 }

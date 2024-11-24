@@ -56,6 +56,43 @@ function updateUserStructure() {
     writeUsers(updatedUsers);
 }
 
+app.post('/update-user-data', (req, res) => {
+    const updatedUserData = req.body;
+
+    // Проверка входных данных
+    if (!updatedUserData || !updatedUserData.login) {
+        return res.status(400).json({ error: 'Необходимо передать данные пользователя с логином.' });
+    }
+
+    const users = readUsers();
+    const userIndex = users.findIndex(user => user.login === updatedUserData.login);
+
+    if (userIndex === -1) {
+        return res.status(404).json({ error: 'Пользователь не найден.' });
+    }
+
+    // Обновление данных пользователя
+    const user = users[userIndex];
+    users[userIndex] = {
+        ...user, // Сохраняем существующие данные
+        ...updatedUserData, // Обновляем только переданные поля
+        recentGames: updatedUserData.recentGames || user.recentGames // Обновляем recentGames, если они переданы
+    };
+
+    // Если недавние игры превышают 5 записей, оставляем последние 5
+    if (users[userIndex].recentGames.length > 5) {
+        users[userIndex].recentGames = users[userIndex].recentGames.slice(-5);
+    }
+
+    // Сохраняем изменения в файл
+    writeUsers(users);
+
+    res.status(200).json({
+        message: 'Данные пользователя успешно обновлены.',
+        user: users[userIndex]
+    });
+});
+
 
 // Вход
 app.post('/login', (req, res) => {
@@ -102,7 +139,8 @@ app.post('/register', (req, res) => {
         login,
         password,
         hints: 3, // Начальные подсказки
-        coins: 2  // Начальные монеты
+        coins: 2,  // Начальные монеты
+        recentGames: []
     };
 
     users.push(newUser);
@@ -203,6 +241,21 @@ app.post('/use-hint', (req, res) => {
     }
 });
 
+app.post('/update-user-rewards', (req, res) => {
+    const { login, hints, coins } = req.body;
+
+    const users = readUsers();
+    const user = users.find(u => u.login === login);
+
+    if (user) {
+        user.hints = hints;
+        user.coins = coins;
+        writeUsers(users);
+        res.status(200).json({ message: 'Rewards updated successfully' });
+    } else {
+        res.status(404).json({ error: 'User not found' });
+    }
+});
 
 
 

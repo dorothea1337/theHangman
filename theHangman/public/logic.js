@@ -18,6 +18,18 @@ async function getCurrentLogin() {
     }
 }
 
+// Логика при загрузке страницы
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('Страница загружена, начинаем работу.');
+
+    const currentLogin = await getCurrentLogin(); // Получаем текущий логин
+    if (currentLogin) {
+        await loadUserDataByLogin(currentLogin); // Загружаем данные пользователя
+    } else {
+        console.error('Не удалось получить текущий логин, данные не будут загружены');
+    }
+});
+
 // Функция для загрузки данных пользователя по логину
 async function loadUserDataByLogin(login) {
     try {
@@ -58,18 +70,6 @@ function updateCoins(coins) {
     });
 }
 
-// Логика при загрузке страницы
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Страница загружена, начинаем работу.');
-
-    const currentLogin = await getCurrentLogin(); // Получаем текущий логин
-    if (currentLogin) {
-        await loadUserDataByLogin(currentLogin); // Загружаем данные пользователя
-    } else {
-        console.error('Не удалось получить текущий логин, данные не будут загружены');
-    }
-});
-
 function updateHints(hints) {
     const hintsElements = document.querySelectorAll('.hints'); // Элементы для отображения монет
     if (hintsElements.length === 0) {
@@ -82,17 +82,7 @@ function updateHints(hints) {
     });
 }
 
-// Логика при загрузке страницы
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('Страница загружена, начинаем работу.');
 
-    const currentLogin = await getCurrentLogin(); // Получаем текущий логин
-    if (currentLogin) {
-        await loadUserDataByLogin(currentLogin); // Загружаем данные пользователя
-    } else {
-        console.error('Не удалось получить текущий логин, данные не будут загружены');
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     const quitButton = document.querySelector('.quit'); // Кнопка выйти
@@ -560,6 +550,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+function addGameResultToUser(result, word = null) {
+    if (!currentUser) {
+        console.error('Текущий пользователь не найден. Невозможно обновить историю игр.');
+        return;
+    }
+
+    // Создаём запись для recentGames
+    const gameRecord = {
+        result: result, // "поражение" или "победа"
+        word: word, // Загаданное слово, если победа
+        timestamp: new Date().toISOString() // Время завершения игры
+    };
+
+    // Если recentGames ещё нет, инициализируем его как пустой массив
+    if (!currentUser.recentGames) {
+        currentUser.recentGames = [];
+    }
+
+    // Добавляем новую запись в начало массива и ограничиваем размер до 5
+    currentUser.recentGames = [gameRecord, ...currentUser.recentGames].slice(0, 5);
+
+    // Сохраняем изменения (локально или на сервере)
+    saveUserData(currentUser);
+}
+
+function saveUserData(user) {
+    // Пример сохранения данных пользователя (на сервере)
+    fetch('/update-user-data', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('Данные пользователя успешно сохранены.');
+            } else {
+                console.error('Ошибка при сохранении данных пользователя.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка сети при сохранении данных пользователя:', error);
+        });
+}
+
 function showGameOverPopup(){
     const overlay = document.getElementById('overlay-defeat');
     overlay.classList.remove('hidden-victory');
@@ -574,6 +610,9 @@ function showGameOverPopup(){
     if (nav){
         nav.style.justifyContent = 'space-between';
     }
+
+    addGameResultToUser('поражение');
+    loadRecentGames();
 }
 
 function showVictoryPopup() {
@@ -590,6 +629,44 @@ function showVictoryPopup() {
     const nav =document.querySelector('.nav');
     if (nav){
         nav.style.justifyContent = 'space-between';
+    }
+
+    // Начисляем игроку 1 подсказку и 1 монету
+    if (currentUser) {
+        currentUser.hints = (currentUser.hints || 0) + 1; // Увеличиваем подсказки
+        currentUser.coins = (currentUser.coins || 0) + 1; // Увеличиваем монеты
+
+        // Обновляем отображение на странице
+        updateHints(currentUser.hints);
+        updateCoins(currentUser.coins);
+
+        console.log('Начислено: 1 подсказка и 1 монета. Текущее состояние:');
+        console.log('Подсказки:', currentUser.hints, 'Монеты:', currentUser.coins);
+
+        // Сохраняем изменения на сервере (если необходимо)
+        fetch('/update-user-rewards', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ login: currentUser.login, hints: currentUser.hints, coins: currentUser.coins }),
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Начисления успешно сохранены на сервере.');
+                } else {
+                    console.error('Ошибка при сохранении начислений на сервере.');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка сети при сохранении начислений:', error);
+            });
+
+        const word = localStorage.getItem('randomWord') || 'неизвестно'; // Загаданное слово
+        addGameResultToUser('победа', word);
+        loadRecentGames();
+    } else {
+        console.warn('Текущий пользователь не найден. Невозможно начислить подсказки и монеты.');
     }
 }
 
@@ -666,4 +743,93 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired');  // Проверим, что скрипт загружается
+
+    const historyIcon = document.querySelector('.header-button.history');
+    const historyWindow = document.querySelector('.history-window');
+    const overlayBackground = document.querySelector('.overlay-background');
+
+    if (historyIcon && historyWindow && overlayBackground) {
+        console.log('history window elements found');  // Проверим, что элементы есть
+        historyIcon.addEventListener('click', () => {
+            console.log('history window clicked');
+            historyWindow.classList.toggle('active');
+            overlayBackground.classList.toggle('active');
+        });
+
+        overlayBackground.addEventListener('click', () => {
+            historyWindow.classList.remove('active');
+            overlayBackground.classList.remove('active');
+        });
+    }
+});
+
+// Функция для загрузки истории игр пользователя
+function loadRecentGames() {
+    // Получаем текущего пользователя
+    fetch('/current-user')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Не удалось получить текущего пользователя');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const currentLogin = data.currentLogin;
+
+            // Загружаем данные пользователя
+            return fetch(`/users.json`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Не удалось загрузить пользователей');
+                    }
+                    return response.json();
+                })
+                .then(users => {
+                    // Находим текущего пользователя в списке
+                    const user = users.find(u => u.login === currentLogin);
+                    if (!user || !user.recentGames) {
+                        console.warn('Нет истории игр для пользователя');
+                        return;
+                    }
+
+                    // Обновляем HTML с историей игр
+                    updateHistoryWindow(user.recentGames);
+                });
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке истории игр:', error);
+        });
+}
+
+// Функция для обновления HTML с историей игр
+function updateHistoryWindow(recentGames) {
+    // Очищаем поля
+    for (let i = 1; i <= 5; i++) {
+        document.getElementById(`recent-game-text-${i}`).textContent = '';
+    }
+
+    // Заполняем поля данными из recentGames
+    recentGames.reverse().forEach((game, index) => {
+        const field = document.getElementById(`recent-game-text-${index + 1}`);
+        if (field) {
+            // Вставляем текст в поле
+            if (typeof game === 'string') {
+                field.textContent = game; // Если просто "победа" или "поражение"
+            } else if (game.result && game.word) {
+                field.textContent = `${game.result}: ${game.word}`;
+            } else {
+                field.textContent = game.result;
+            }
+        }
+    });
+}
+
+// Вызываем функцию при загрузке страницы
+window.addEventListener('DOMContentLoaded', () => {
+    loadRecentGames();
+});
+
 
