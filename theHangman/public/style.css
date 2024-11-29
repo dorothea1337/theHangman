@@ -11,6 +11,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    background-color: white;
 }
 
 .header {
@@ -160,11 +161,10 @@ body {
 }
 
 .recent-game-text {
-    white-space: nowrap; /* Запрещаем перенос строк */
-    overflow: hidden; /* Скрыть содержимое, если оно выходит за пределы */
-    text-overflow: ellipsis; /*Добавляем многоточие, если текст не помещается */
+    white-space: nowrap;
+    overflow: hidden; 
+    text-overflow: ellipsis; 
 }
-
 
 .text-btn {
     cursor: pointer;
@@ -224,7 +224,7 @@ body {
 
 .hang-box {
     position: relative;
-    width: 330px; /* Установите ширину, соответствующую виселице */
+    width: 330px; 
     height: auto;
 }
 
@@ -235,10 +235,10 @@ body {
 
 .bro-person {
     position: absolute;
-    top: 0; /* Регулируйте позицию, чтобы совместить с виселицей */
+    top: 0; 
     left: 0;
-    width: 330px; /* Та же ширина, что и у виселицы */
-    z-index: 2; /* Уровень выше виселицы */
+    width: 330px; 
+    z-index: 2; 
 }
 
 .bro-person img {
@@ -369,9 +369,8 @@ body {
 }
 
 .letter-button.correct {
-    background-color: white;
-    color: black;
-    border-color: white;
+    background-color: rgba(0, 255, 51, 0.67);
+    color: greenyellow;
     cursor: not-allowed;
 }
 

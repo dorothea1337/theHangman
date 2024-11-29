@@ -1,7 +1,7 @@
 [
   {
     "login": "drth",
-    "score": 35
+    "score": 50
   },
   {
     "login": "qwerty",
@@ -9,10 +9,14 @@
   },
   {
     "login": "1",
-    "score": 8
+    "score": 9
   },
   {
     "login": "ghost",
-    "score": 1
+    "score": 8
+  },
+  {
+    "login": "2",
+    "score": 0
   }
 ]

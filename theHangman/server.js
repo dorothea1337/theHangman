@@ -2,6 +2,8 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const session = require('express-session');
+const multer = require('multer');
+
 
 
 const app = express();
@@ -29,6 +31,7 @@ const wordsHardEnPath = path.join(__dirname, 'words-hard-en.txt');
 const usersFilePath = path.join(__dirname, 'users.json');
 const leadersFilePath = path.join(__dirname, 'leaders.json');
 
+const uploadsDir = path.join(__dirname, 'public/uploads');
 
 //=======================================СИСТЕМА АККАУНТОВ===============================
 
@@ -54,9 +57,24 @@ app.post('/register', (req, res) => {
 
     users.push(newUser);
     writeUsers(users);
+
+    createUserFolder(login);
+
+    console.log('upd callin');
+    updateUserStructure();
+    console.log('upd called');
+
     return res.status(201).send('Registration successful');
 });
 updateUserStructure();
+
+function createUserFolder(login) {
+    const userFolder = path.join(uploadsDir, login);
+    if (!fs.existsSync(userFolder)) {
+        fs.mkdirSync(userFolder, { recursive: true });
+        console.log(`Папка для пользователя ${login} создана.`);
+    }
+}
 
 app.get('/users.json', (req, res) => {
     const filePath = path.join(__dirname, 'users.json');
@@ -72,17 +90,30 @@ function readUsers() {
 }
 
 function writeUsers(users) {
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+    try {
+        fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+        console.log('Users updated successfully');
+    } catch (err) {
+        console.error('Error writing users:', err);
+    }
 }
 
 function updateUserStructure() {
+    console.log('updateUserStructure called');
     const users = readUsers();
 
-    const updatedUsers = users.map(user => ({
-        ...user,
-        hints: user.hints ?? 3, // Устанавливаем 3 подсказки, если их нет
-        coins: user.coins ?? 2  // Устанавливаем 2 монеты, если их нет
-    }));
+    const updatedUsers = users.map(user => {
+        // Создаём папку, если её нет
+        createUserFolder(user.login);
+
+        return {
+            ...user,
+            hints: user.hints ?? 3,
+            coins: user.coins ?? 2,
+            skins: user.skins ?? [],
+            currentSkin: user.currentSkin ?? "default"
+        };
+    });
 
     writeUsers(updatedUsers);
 }
@@ -104,10 +135,13 @@ app.post('/update-user-data', (req, res) => {
 
     // Обновление данных пользователя
     const user = users[userIndex];
+    const newSkins = updatedUserData.skins || [];
+    const newSkin = newSkins.find(skin => !user.skins.includes(skin));
+
     users[userIndex] = {
-        ...user, // Сохраняем существующие данные
-        ...updatedUserData, // Обновляем только переданные поля
-        recentGames: updatedUserData.recentGames || user.recentGames // Обновляем recentGames, если они переданы
+        ...user, 
+        ...updatedUserData, 
+        recentGames: updatedUserData.recentGames || user.recentGames 
     };
 
     // Если недавние игры превышают 5 записей, оставляем последние 5
@@ -115,7 +149,21 @@ app.post('/update-user-data', (req, res) => {
         users[userIndex].recentGames = users[userIndex].recentGames.slice(-5);
     }
 
-    // Сохраняем изменения в файл
+    if (updatedUserData.skins) {
+        if (newSkin) {
+            if (user.coins < 3) {
+                return res.status(400).json({ error: 'Недостаточно монет для покупки скина.' });
+            }
+    
+            // Обновляем монеты и добавляем скин
+            user.coins -= 3;
+            user.skins.push(newSkin);
+        }
+    }
+    
+    user.currentSkin = updatedUserData.currentSkin || user.currentSkin;
+    users[userIndex] = user;
+
     writeUsers(users);
 
     res.status(200).json({
@@ -145,7 +193,6 @@ app.get('/leaders', (req, res) => {
 // Вход
 app.post('/login', (req, res) => {
     const { login, password } = req.body;
-    console.log('Получен запрос на вход:', { login, password }); // Лог для отладки
 
     const users = readUsers();
     console.log('Существующие пользователи:', users); // Лог для проверки пользователей
@@ -153,18 +200,15 @@ app.post('/login', (req, res) => {
     const user = users.find(u => u.login === login && u.password === password);
 
     if (user) {
-        console.log('Успешный вход');
-        req.session.currentLogin = user.login;  // Сохраняем логин в сессии
+        req.session.currentLogin = user.login;
         return res.status(200).send('Login successful');
     } else {
-        console.log('Ошибка входа: Неверный логин или пароль');
         return res.status(401).send('Invalid login or password');
     }
 });
 
 // Эндпоинт для получения текущего пользователя
 app.get('/current-user', (req, res) => {
-    // Проверяем, авторизован ли пользователь через сессию
     if (!req.session.currentLogin) {
         return res.status(401).json({ error: "Пользователь не авторизован" });
     }
@@ -172,7 +216,6 @@ app.get('/current-user', (req, res) => {
 });
 
 function updateLeadersFile() {
-    // Чтение файла users.json
     fs.readFile(usersFilePath, 'utf8', (err, data) => {
         if (err) {
             console.error('Ошибка при чтении users.json:', err);
@@ -181,7 +224,7 @@ function updateLeadersFile() {
 
         let users;
         try {
-            users = JSON.parse(data); // Парсим содержимое users.json
+            users = JSON.parse(data);
         } catch (parseError) {
             console.error('Ошибка при разборе JSON из users.json:', parseError);
             return;
@@ -191,9 +234,9 @@ function updateLeadersFile() {
         const leaders = users
             .map(user => ({
                 login: user.login,
-                score: user.score || 0, // Учитываем, что score может отсутствовать
+                score: user.score || 0, 
             }))
-            .sort((a, b) => b.score - a.score); // Сортировка по убыванию score
+            .sort((a, b) => b.score - a.score); 
 
         // Запись отсортированных лидеров в leaders.json
         fs.writeFile(leadersFilePath, JSON.stringify(leaders, null, 2), 'utf8', writeErr => {
@@ -208,8 +251,6 @@ function updateLeadersFile() {
 
 // Устанавливаем интервал для обновления файла раз в 10 секунд
 setInterval(updateLeadersFile, 10000);
-
-// Запускаем первое обновление при старте сервера
 updateLeadersFile();
 
 app.post('/logout', (req, res) => {
@@ -217,17 +258,15 @@ app.post('/logout', (req, res) => {
     
     req.session.destroy((err) => {
         if (err) {
-            console.error('Ошибка при завершении сессии:', err);
             return res.status(500).send('Ошибка при выходе');
         }
         res.clearCookie('user');
-        console.log('Пользователь вышел, отправка успешного ответа');
-        res.status(200).json({ message: 'Logout successful' }); // Успешный ответ
+        res.status(200).json({ message: 'Logout successful' });
     });
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html')); // Или другой файл входа
+    res.sendFile(path.join(__dirname, 'public', 'login.html')); 
 });
 
 
@@ -344,6 +383,41 @@ app.post('/update-user-rewards', (req, res) => {
     }
 });
 
+//=============== СКИНЫ ======================
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const userFolder = path.join(uploadsDir, req.session.currentLogin || 'default'); // Используем login пользователя или 'default'
+        if (!fs.existsSync(userFolder)) {
+            fs.mkdirSync(userFolder, { recursive: true });
+        }
+        cb(null, userFolder); // Указываем путь для сохранения файла
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname); // Сохраняем файл с его оригинальным именем
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype !== 'image/png') {
+        return cb(new Error('Только PNG-файлы разрешены'));
+    }
+    cb(null, true);
+};
+
+const upload = multer({ storage, fileFilter });
+
+// Эндпоинт для загрузки скинов
+app.post('/upload-skin', upload.single('skin'), (req, res) => {
+    const login = req.session.currentLogin;
+
+    if (!login) {
+        return res.status(401).send('Пользователь не авторизован');
+    }
+
+    const filePath = path.join('uploads', login, req.file.filename);
+
+    res.json({ path: filePath });
+});
 
 
 app.use(express.static('public'));

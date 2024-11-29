@@ -2,52 +2,90 @@
   {
     "login": "drth",
     "password": "1111",
-    "hints": 19,
-    "coins": 28,
+    "hints": 26,
+    "coins": 17,
     "recentGames": [
       {
         "result": "победа",
-        "word": "delicate\r",
-        "timestamp": "2024-11-24T22:31:55.204Z"
+        "word": "феминистка\r",
+        "timestamp": "2024-11-28T10:06:23.212Z"
       },
       {
         "result": "победа",
-        "word": "благовоние\r",
-        "timestamp": "2024-11-24T22:31:40.000Z"
+        "word": "дюймовочка\r",
+        "timestamp": "2024-11-28T10:05:22.102Z"
       },
       {
         "result": "победа",
-        "word": "environmental\r",
-        "timestamp": "2024-11-24T22:31:11.503Z"
+        "word": "ефрейтор\r",
+        "timestamp": "2024-11-25T22:45:39.081Z"
       },
       {
         "result": "победа",
-        "word": "rotate\r",
-        "timestamp": "2024-11-24T22:25:30.117Z"
+        "word": "указание\r",
+        "timestamp": "2024-11-25T22:43:28.719Z"
       },
       {
-        "result": "поражение",
-        "word": null,
-        "timestamp": "2024-11-24T22:15:11.720Z"
+        "result": "победа",
+        "word": "табличка\r",
+        "timestamp": "2024-11-25T22:41:24.333Z"
       }
     ],
-    "score": 35
+    "score": 50,
+    "skins": [
+      "blue",
+      "default",
+      "my-skin-1",
+      "red",
+      "my-skin"
+    ],
+    "currentSkin": "my-skin-1"
   },
   {
     "login": "ghost",
     "password": "0000",
-    "hints": 2,
+    "hints": 4,
     "coins": 1,
-    "recentGames": [],
-    "score": 1
+    "recentGames": [
+      {
+        "result": "победа",
+        "word": "гематома\r",
+        "timestamp": "2024-11-28T20:20:21.153Z"
+      },
+      {
+        "result": "победа",
+        "word": "гувернёр\r",
+        "timestamp": "2024-11-28T20:19:07.616Z"
+      },
+      {
+        "result": "победа",
+        "word": "забастовка\r",
+        "timestamp": "2024-11-28T20:18:35.650Z"
+      },
+      {
+        "result": "поражение",
+        "word": null,
+        "timestamp": "2024-11-28T10:08:15.472Z"
+      }
+    ],
+    "score": 8,
+    "skins": [
+      "blue",
+      "default",
+      "red",
+      "my-skin-1"
+    ],
+    "currentSkin": "my-skin-1"
   },
   {
     "login": "1",
     "password": "1",
-    "hints": 3,
-    "coins": 2,
+    "hints": 4,
+    "coins": 3,
     "recentGames": [],
-    "score": 8
+    "score": 9,
+    "skins": [],
+    "currentSkin": "default"
   },
   {
     "login": "qwerty",
@@ -61,6 +99,18 @@
         "timestamp": "2024-11-24T18:22:44.407Z"
       }
     ],
-    "score": 10
+    "score": 10,
+    "skins": [],
+    "currentSkin": "default"
+  },
+  {
+    "login": "2",
+    "password": "2",
+    "hints": 3,
+    "coins": 2,
+    "recentGames": [],
+    "score": 0,
+    "skins": [],
+    "currentSkin": "default"
   }
 ]

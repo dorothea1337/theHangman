@@ -11,7 +11,8 @@ async function getCurrentLogin() {
 
         const data = await response.json();
         console.log('Текущий логин с сервера:', data.currentLogin);
-        return data.currentLogin; // Возвращаем логин
+        localStorage.setItem('currentLogin', data.currentLogin);
+        return data.currentLogin;
     } catch (error) {
         console.error('Ошибка при запросе текущего логина:', error);
         return null;
@@ -102,10 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
-                console.log('Пользователь вышел успешно');
+                
                 clearGameState();
+                localStorage.removeItem('currentLogin');
+                console.log('Пользователь вышел успешно');
                 // Перенаправляем на страницу входа
                 window.location.href = '/login';
+
             } else {
                 console.error('Ошибка при выходе');
             }
@@ -221,15 +225,21 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Восстановлено сохраненное состояние игры:', savedState);
         createPlayground('_', 'fields', randomWord.length);
 
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        const fieldTextColor = currentTheme === 'dark' ? 'white' : 'black'; // Цвет для текста на игровом поле
+        const buttonTextColor = currentTheme === 'dark' ? 'black' : 'white';
+
         // Восстанавливаем отгаданные буквы
         const fields = document.querySelectorAll('.empty-field');
         savedState.guessedLetters.forEach((letter, index) => {
             if (letter) {
                 fields[index].textContent = letter;
-                fields[index].style.color = 'black';
+                fields[index].style.color = fieldTextColor;
                 fields[index].style.fontFamily = 'Melectron';
             }
         });
+
+        
 
         // Восстанавливаем состояние кнопок
         const letterButtons = document.querySelectorAll('.letter-button');
@@ -238,9 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (savedState.usedLetters[letter]) {
                 button.disabled = true;
                 if (savedState.usedLetters[letter] === 'correct') {
-                    button.style.backgroundColor = 'white';
-                    button.style.color = 'white';
-                    button.style.borderColor = 'white';
+                    button.style.backgroundColor = 'green';
+                    button.style.color = buttonTextColor;
+                    button.style.borderColor = 'green';
                     button.style.fontColor = 'White';
                     button.style.cursor = 'default';
                 } else {
@@ -306,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Устанавливаем язык перед переходом
             setGameLanguage();
             clearGameState();
+            localStorage.removeItem('selectedSkin');
             window.location.href = 'index.html'; 
         });
     }
@@ -383,14 +394,19 @@ function handleLetterClick(letter, word, button) {
 
     let isLetterFound = false;
 
+    // Получаем текущую тему из localStorage
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    const fieldTextColor = currentTheme === 'dark' ? 'white' : 'black'; // Цвет для текста на игровом поле
+    const buttonTextColor = currentTheme === 'dark' ? 'black' : 'white'; // Цвет для кнопки
+
     wordArray.forEach((char, index) => {
         if (char === letter) {
             isLetterFound = true;
             fields[index].textContent = char; // Заменяем символ _ на букву
-            fields[index].style.color = 'black'; // Отображаем букву
+            fields[index].style.color = fieldTextColor; // Устанавливаем цвет текста в зависимости от темы
             guessedLetters[index] = char;
             fields[index].style.fontFamily = 'Melectron';
-            fields[index].style.lineHeigth = '0%';
+            fields[index].style.lineHeight = '0%';
 
             // Уменьшаем размер шрифта, если нужно
             adjustFontSizeIfNeeded();
@@ -400,9 +416,9 @@ function handleLetterClick(letter, word, button) {
     // Обновляем состояние кнопки
     button.disabled = true;
     if (isLetterFound) {
-        button.style.backgroundColor = 'white';
-        button.style.color = 'white';
-        button.style.borderColor = 'white';
+        button.style.backgroundColor = 'green';
+        button.style.color = buttonTextColor; 
+        button.style.borderColor = 'green';
         usedLetters[letter] = 'correct';
         button.style.cursor = 'default';
     } else {
@@ -425,8 +441,16 @@ function handleLetterClick(letter, word, button) {
     }
 }
 
+
 const bodyParts = ['bro-head', 'bro-body', 'bro-left-hand', 'bro-right-hand', 'bro-left-leg', 'bro-right-leg'];
-let errorCount = 0; // Счётчик ошибок
+let errorCount = 0; 
+
+// Список стандартных скинов
+const availableSkins = {
+    default: 'bro',
+    red: 'red-bro',
+    blue: 'blue-bro',
+};
 
 function loadErrorState() {
     const errorState = localStorage.getItem('errorState');
@@ -457,8 +481,72 @@ function initializeErrorState() {
     }
 }
 
+
+
 function showNextBodyPart() {
-    const hangImage = document.getElementById('hang-img'); // Элемент изображения виселицы
+    const hangImage = document.getElementById('hang-img'); 
+    const currentUserLogin = localStorage.getItem('currentLogin'); // Берём логин текущего пользователя
+
+    fetch('/users.json') // Загружаем файл users.json
+        .then(response => response.json())
+        .then(users => {
+            const user = users.find(u => u.login === currentUserLogin); // Ищем пользователя по логину
+            if (user) {
+                currentSkin = user.currentSkin || 'default';
+
+                // Здесь выполняем логику с изменением изображений
+                updateBroAppearance(currentSkin, currentUserLogin);
+            } else {
+                console.error('Пользователь не найден в файле users.json');
+            }
+        })
+        .catch(err => console.error('Ошибка загрузки файла users.json:', err));
+
+    // Функция для обновления внешнего вида
+    function updateBroAppearance(skin, currentUserLogin) {
+        const headImg = document.getElementById('bro-head');
+        const bodyImg = document.getElementById('bro-body');
+        const leftHandImg = document.getElementById('bro-left-hand');
+        const rightHandImg = document.getElementById('bro-right-hand');
+        const leftLegImg = document.getElementById('bro-left-leg');
+        const rightLegImg = document.getElementById('bro-right-leg');
+
+        if (skin === 'blue') {
+            console.log('Скин: синий');
+            headImg.src = './content/blue-bro-head.png';
+            bodyImg.src = './content/blue-bro-body.png';
+            leftHandImg.src = './content/blue-bro-leftHand.png';
+            rightHandImg.src = './content/blue-bro-rightHand.png';
+            leftLegImg.src = './content/blue-bro-leftLeg.png';
+            rightLegImg.src = './content/blue-bro-rightLeg.png';
+        } else if (skin === 'red') {
+            console.log('Скин: красный');
+            headImg.src = './content/red-bro-head.png';
+            bodyImg.src = './content/red-bro-body.png';
+            leftHandImg.src = './content/red-bro-leftHand.png';
+            rightHandImg.src = './content/red-bro-rightHand.png';
+            leftLegImg.src = './content/red-bro-leftLeg.png';
+            rightLegImg.src = './content/red-bro-rightLeg.png';
+        } else if (skin === 'my-skin-1') {
+            console.log('Скин: мой скин 1');
+            // Загрузка изображений из папки uploads/{login}
+            headImg.src = `./uploads/${currentUserLogin}/head.png`;
+            bodyImg.src = `./uploads/${currentUserLogin}/body.png`;
+            leftHandImg.src = `./uploads/${currentUserLogin}/leftHand.png`;
+            rightHandImg.src = `./uploads/${currentUserLogin}/rightHand.png`;
+            leftLegImg.src = `./uploads/${currentUserLogin}/leftLeg.png`;
+            rightLegImg.src = `./uploads/${currentUserLogin}/rightLeg.png`;
+        } else {
+            console.log('Скин: стандартный');
+            headImg.src = './content/head.png';
+            bodyImg.src = './content/body.png';
+            leftHandImg.src = './content/leftHand.png';
+            rightHandImg.src = './content/rightHand.png';
+            leftLegImg.src = './content/leftLeg.png';
+            rightLegImg.src = './content/rightLeg.png';
+            }
+        }
+    
 
     if (errorCount < bodyParts.length) {
         if (errorCount === 0 && hangImage) {
@@ -631,7 +719,6 @@ function addGameResultToUser(result, word = null) {
     // Добавляем новую запись в начало массива и ограничиваем размер до 5
     currentUser.recentGames = [gameRecord, ...currentUser.recentGames].slice(0, 5);
 
-    // Сохраняем изменения (локально или на сервере)
     saveUserData(currentUser);
 }
 
@@ -807,6 +894,8 @@ document.querySelector('.cross-1').addEventListener('click', () => {
     overlayDefeat.style.display = 'none';
 });
 
+//============================ВИЗУАЛ==========================================
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded event fired');  // Проверим, что скрипт загружается
 
@@ -831,14 +920,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded event fired');  // Проверим, что скрипт загружается
+    console.log('DOMContentLoaded event fired');  
 
     const historyIcon = document.querySelector('.header-button.history');
     const historyWindow = document.querySelector('.history-window');
     const overlayBackground = document.querySelector('.overlay-background');
 
     if (historyIcon && historyWindow && overlayBackground) {
-        console.log('history window elements found');  // Проверим, что элементы есть
+        console.log('history window elements found');  
         historyIcon.addEventListener('click', () => {
             console.log('history window clicked');
             historyWindow.classList.toggle('active');
@@ -925,13 +1014,11 @@ function updateHistoryWindow(recentGames) {
     });
 }
 
-// Вызываем функцию при загрузке страницы
 window.addEventListener('DOMContentLoaded', () => {
     loadRecentGames();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Index page script loaded'); // Проверим, что скрипт запускается на нужной странице
 
     const leaderIcon = document.querySelector('.header-button.leader');
     const leaderWindow = document.querySelector('.leader-window');
@@ -1006,4 +1093,223 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded: Checking theme preference');
+
+    const switchThemeButton = document.querySelector('.switch-theme');
+    const leaderIcon = document.querySelector('.leader-table');
+    const historyIcon = document.querySelector('.history');
+    const profileIcon = document.querySelector('.profile');
+    const arrowIcon = document.querySelector('.arrow');
+    const letterButtons = document.querySelectorAll('.letter-button');
+
+    // Функция для применения темы
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.style.backgroundColor = 'black';
+            const paragraphs = document.querySelectorAll('p:not(.recent-game-text):not(.leader-text):not(.plus-one):not(.play-again):not(.profile-window p)');
+            paragraphs.forEach(p => {
+                p.style.color = 'white';
+            });
+
+            const headings = document.querySelectorAll('.h1');
+            headings.forEach(h => {
+                h.style.color = 'white';
+            });
+
+            const fields = document.querySelectorAll('span');
+            fields.forEach(field => {
+                field.style.color = 'white';
+            });
+
+            leaderIcon.src = 'content/leadersWhite.svg';
+            historyIcon.src = 'content/historyWhite.svg';
+            profileIcon.src = 'content/profileWhite.svg';
+            arrowIcon.src = 'content/arrowWhite.svg';
+
+            // Обновление стилей кнопок
+            letterButtons.forEach(button => {
+                if (!button.disabled) {
+                    button.style.border = '1px solid white';
+                }
+            });
+
+            // Сохранение текущей темы
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.style.backgroundColor = 'white';
+            const paragraphs = document.querySelectorAll(
+                'p:not(.recent-game-text):not(.leader-text):not(.plus-one):not(.play-again):not(.profile-window p)');
+            paragraphs.forEach(p => {
+                p.style.color = 'black';
+            });
+
+            const headings = document.querySelectorAll('.h1');
+            headings.forEach(h => {
+                h.style.color = 'black';
+            });
+
+            const fields = document.querySelectorAll('span');
+            fields.forEach(field => {
+                field.style.color = 'black';
+            });
+
+            leaderIcon.src = 'content/leaders.svg';
+            historyIcon.src = 'content/history.svg';
+            profileIcon.src = 'content/profile.svg';
+            arrowIcon.src = 'content/arrow.svg';
+
+            // Обновление стилей кнопок
+            letterButtons.forEach(button => {
+                if (!button.disabled) {
+                    button.style.border = '1px solid black';
+                }
+            });
+
+            // Сохранение текущей темы
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Проверка текущей темы в localStorage
+    const savedTheme = localStorage.getItem('theme') || 'light'; // Если не задано, по умолчанию светлая тема
+    applyTheme(savedTheme);
+
+    // Слушатель на переключение темы
+    if (switchThemeButton) {
+        switchThemeButton.addEventListener('click', () => {
+            const currentTheme = localStorage.getItem('theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+    }
+
+    // Функция для обновления состояния кнопок
+    function updateButtonState(button, state) {
+        const currentTheme = localStorage.getItem('theme') || 'light';
+
+        if (state === 'correct') {
+            button.style.backgroundColor = currentTheme === 'dark' ? 'black' : 'green';
+            button.style.color = currentTheme === 'dark' ? 'white' : 'green';
+            button.style.borderColor = currentTheme === 'dark' ? 'black' : 'white';
+        } else if (!button.disabled) {
+            button.style.backgroundColor = 'transparent';
+            button.style.border = currentTheme === 'dark' ? '1px solid white' : '1px solid black';
+            
+        }
+    }
+
+    // Обновление стилей кнопок при загрузке
+    letterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Пример обработки клика кнопки: отмечаем состояние correct
+            const isCorrect = Math.random() > 0.5; // Замените эту логику своей
+            const state = isCorrect ? 'correct' : 'incorrect';
+            updateButtonState(button, state);
+
+            if (state === 'correct') {
+                button.disabled = true; // Деактивируем кнопку
+            }
+        });
+
+        // Установка начального состояния кнопок
+        updateButtonState(button, 'default');
+    });
+});
+
+//================= СКИНЫ ===================
+
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUserLogin = localStorage.getItem('currentLogin'); // Получение логина текущего пользователя
+    let currentSkin = 'default';
+    const userSkins = new Set();
+    const skinsContainer = document.querySelector('.collection-window-1');
+
+    updateSkinsUI();
+
+    // Функция для обновления интерфейса
+    function updateSkinsUI() {
+        // Сброс рамок всех скинов
+        skinsContainer.querySelectorAll('.skin').forEach(skin => {
+            skin.style.border = '';
+        });
+
+        // Установка зелёной рамки для активного скина
+        const activeSkin = document.querySelector(`.skin.${currentSkin}`);
+        if (activeSkin) {
+            activeSkin.style.border = '3px solid green';
+        }
+
+        // Удаление оверлея с купленных скинов
+        userSkins.forEach(skin => {
+            const overlay = document.querySelector(`.skin.${skin} .skin-overlay`);
+            if (overlay) overlay.style.display = 'none';
+        });
+    }
+
+    // Загрузка данных пользователя с сервера
+    fetch(`/users.json`)
+        .then(response => response.json())
+        .then(users => {
+            const user = users.find(u => u.login === currentUserLogin);
+
+            if (!user) return console.error('Пользователь не найден');
+
+            currentSkin = user.currentSkin || 'default';
+            userSkins.clear();
+            user.skins.forEach(skin => userSkins.add(skin));
+
+            updateSkinsUI();
+        })
+        .catch(err => console.error('Ошибка загрузки пользователей:', err));
+
+    // Обработчик кликов на скины
+    skinsContainer.addEventListener('click', (e) => {
+        const skinElement = e.target.closest('.skin');
+        if (!skinElement) return;
+
+        const skinName = skinElement.classList[1]; // Второй класс указывает на имя скина
+
+        if (userSkins.has(skinName)) {
+            // Скин уже куплен — активируем его
+            currentSkin = skinName;
+
+            // Обновляем сервер
+            fetch('/update-user-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login: currentUserLogin, currentSkin }),
+            }).then(() => updateSkinsUI())
+              .catch(err => console.error('Ошибка обновления текущего скина:', err));
+        } else {
+            // Покупаем скин
+            fetch('/users.json')
+                .then(response => response.json())
+                .then(users => {
+                    const user = users.find(u => u.login === currentUserLogin);
+
+                    if (!user) return console.error('Пользователь не найден');
+                    if (user.coins < 3) {
+                        return alert('Недостаточно монет для покупки скина');
+                    }
+
+                    // Обновляем данные
+                    userSkins.add(skinName);
+                    user.coins -= 3;
+
+                    fetch('/update-user-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            login: currentUserLogin,
+                            skins: Array.from(userSkins),
+                            coins: user.coins,
+                        }),
+                    }).then(() => updateSkinsUI())
+                      .catch(err => console.error('Ошибка покупки скина:', err));
+                });
+        }
+    });
 });

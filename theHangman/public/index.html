@@ -76,9 +76,75 @@
             <img class="coin-icon" src="content/coin.png">
         </div>
     </div>
+    <div class="collection-window-1">
+        <div class="default-skins skins">
+            <div class="skin default">
+                <img class="skin-img" src="content/bro.png">
+                <p class="skin-def def">Обычный</p>
+            </div>
+            <div class="skin blue">
+                <img class="skin-img" src="content/bro-blue.png">
+                <p class="skin-def bl">Синий</p>
+                <div class="skin-overlay overlay-blue">
+                    <p>3</p>
+                    <img src="content/coin.png">
+                </div>
+            </div>
+            <div class="skin red">
+                <img class="skin-img" src="content/bro-red.png">
+                <p class="skin-def rd">Красный</p>
+                <div class="skin-overlay overlay-red">
+                    <p>3</p>
+                    <img src="content/coin.png">
+                </div>
+            </div>
+        </div>
+        <div class="custom-skins skins">
+            <div class="skin my-skin-1">
+                <img class="skin-img">
+                <p class="skin-def skin-custom">Кастомный</p>
+                <div class="skin-overlay overlay-custom-1">
+                    <p>3</p>
+                    <img src="content/coin.png">
+                </div>
+            </div>
+        </div>
+        <div class="add-skin">
+            <div class="skins">
+                <div class="add-head add-window">
+                    <img class="add-head-img skin-img">
+                    <p class="add-head-button add" data-type="head">Голова</p>
+                </div>
+                <div class="add-body add-window">
+                    <img class="add-body-img skin-img">
+                    <p class="add-body-button add" data-type="body">Тело</p>
+                </div>
+                <div class="add-leftHand add-window">
+                    <img class="add-leftHand-img skin-img">
+                    <p class="add-leftHand-button add" data-type="leftHand">Левая рука</p>
+                </div>
+            </div>
+            <div class="skins">
+                <div class="add-rightHand add-window">
+                    <img class="add-rightHand-img skin-img">
+                    <p class="add-rightHand-button add" data-type="rightHand">Правая рука</p>
+                </div>
+                <div class="add-leftLeg add-window">
+                    <img class="add-leftLeg-img skin-img">
+                    <p class="add-leftLeg-button add" data-type="leftLeg">Левая нога</p>
+                </div>
+                <div class="add-rightLeg add-window">
+                    <img class="add-rightLeg-img skin-img">
+                    <p class="add-rightLeg-button add" data-type="rightLeg">Правая нога</p>
+                </div>
+            </div>
+            <p class="save-added-btn">Сохранить</p>
+            <input type="file" id="fileInput" accept="image/png" style="display: none;" />
+        </div>
+    </div>
     <div class="body">
         <div class="bro">
-            <img src="content/bro.png">
+            <img src="content/bro.png" class="bro-image">
         </div>
         <div class="level-selecting">
             <p id="get-word-light" class="get-word-button light">Лёгкий</p>

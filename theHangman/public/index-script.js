@@ -176,7 +176,7 @@ function loadLeaders() {
                             leaderText.textContent = `${i}. ${leader.login}, score: ${leader.score}`;
                         }
                     } else {
-                        leaderText.textContent = ''; // Очищаем поле, если лидера нет
+                        leaderText.textContent = ''; 
                     }
                 } else {
                     console.warn(`Элемент leader-text-${i} не найден`);
@@ -197,8 +197,330 @@ document.addEventListener('DOMContentLoaded', () => {
     if (leaderIcon && leaderWindow) {
         leaderIcon.addEventListener('click', () => {
             if (!leaderWindow.classList.contains('active')) {
-                loadLeaders(); // Обновляем список лидеров при открытии окна
+                loadLeaders(); 
             }
         });
     }
 });
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Index page script loaded'); // Проверим, что скрипт запускается на нужной странице
+
+    const switchTheme = document.querySelector('.switch-theme'); 
+    const bro = document.querySelector('.bro-image');
+    const leaderIcon = document.querySelector('.leader-table');
+    const historyIcon = document.querySelector('.history1');
+    const profileIcon = document.querySelector('.profile1');
+
+    // Функция для установки темы
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            // Установка темной темы
+            document.body.style.backgroundColor = 'black';
+
+            // Изменение цвета текста всех <p>, кроме исключений
+            const paragraphs = document.querySelectorAll(
+                'p:not(.recent-game-text):not(.leader-text):not(.profile-window-1 p)'
+            );
+            paragraphs.forEach(p => {
+                p.style.color = 'white';
+            });
+
+            // Изменение цвета текста всех элементов с классом h1
+            const headings = document.querySelectorAll('.h1');
+            headings.forEach(h => {
+                h.style.color = 'white';
+            });
+
+            // Изменение изображений
+            bro.src = 'content/broWhite.png';
+            leaderIcon.src = 'content/leadersWhite.svg';
+            historyIcon.src = 'content/historyWhite.svg';
+            profileIcon.src = 'content/profileWhite.svg';
+
+            // Сохранение темы в localStorage
+            localStorage.setItem('theme', 'dark');
+        } else {
+            // Установка светлой темы
+            document.body.style.backgroundColor = 'white';
+
+            // Изменение цвета текста всех <p>, включая исключения
+            const paragraphs = document.querySelectorAll(
+                'p:not(.recent-game-text):not(.leader-text):not(.profile-window-1 p)'
+            );
+            paragraphs.forEach(p => {
+                p.style.color = 'black';
+            });
+
+            // Изменение цвета текста всех элементов с классом h1
+            const headings = document.querySelectorAll('.h1');
+            headings.forEach(h => {
+                h.style.color = 'black';
+            });
+
+            // Изменение изображений
+            bro.src = 'content/bro.png'; // Оригинальное изображение
+            leaderIcon.src = 'content/leaders.svg';
+            historyIcon.src = 'content/history.svg';
+            profileIcon.src = 'content/profile.svg';
+
+            // Сохранение темы в localStorage
+            localStorage.setItem('theme', 'light');
+        }
+    }
+
+    // Установка темы при загрузке страницы
+    const savedTheme = localStorage.getItem('theme') || 'light'; // По умолчанию светлая тема
+    setTheme(savedTheme);
+
+    // Слушатель переключения темы
+    if (switchTheme) {
+        switchTheme.addEventListener('click', () => {
+            // Переключение темы
+            const currentTheme = localStorage.getItem('theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+    }
+});
+
+
+//================== СКИНЫ ==================
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUserLogin = localStorage.getItem('currentLogin');
+    console.log('login tried');
+
+    let currentSkin = 'default';
+    const userSkins = new Set();
+    const skinsContainer = document.querySelector('.collection-window-1');
+
+    // Очищаем интерфейс
+    function clearGameState() {
+        currentSkin = 'default';
+        userSkins.clear();
+        skinsContainer.querySelectorAll('.skin').forEach(skin => {
+            skin.style.border = '';
+            const overlay = skin.querySelector('.skin-overlay');
+            if (overlay) overlay.style.display = 'block';
+        });
+    }
+
+    // Загрузка данных пользователя
+    function loadUserData() {
+        fetch(`/users.json`)
+            .then(response => response.json())
+            .then(users => {
+                const user = users.find(u => u.login === currentUserLogin);
+
+                if (!user) {
+                    console.error('Пользователь не найден');
+                    return;
+                }
+
+                currentSkin = user.currentSkin || 'default';
+                userSkins.clear();
+                user.skins.forEach(skin => userSkins.add(skin));
+
+                updateSkinsUI();
+            })
+            .catch(err => console.error('Ошибка загрузки пользователей:', err));
+    }
+
+    // Обновление интерфейса
+    function updateSkinsUI() {
+        skinsContainer.querySelectorAll('.skin').forEach(skin => {
+            skin.style.border = '';
+        });
+
+        const activeSkin = document.querySelector(`.skin.${currentSkin}`);
+        if (activeSkin) {
+            activeSkin.style.border = '3px solid green';
+        }
+
+        userSkins.forEach(skin => {
+            const overlay = document.querySelector(`.skin.${skin} .skin-overlay`);
+            if (overlay) overlay.style.display = 'none';
+        });
+    }
+
+    // Загружаем данные пользователя
+    loadUserData();
+
+    skinsContainer.addEventListener('click', (e) => {
+        const skinElement = e.target.closest('.skin');
+        if (!skinElement) return;
+
+        let skinName = skinElement.classList[1]; // Второй класс указывает на имя скина
+
+        if (skinElement.classList.contains('custom-skin')) {
+            // Если это кастомный скин, определяем его уникальное имя
+            const customSkinIndex = Array.from(skinsContainer.querySelectorAll('.custom-skin')).indexOf(skinElement) + 1;
+            skinName = `${currentUserLogin}-custom-${customSkinIndex}`;
+        }
+
+        if (userSkins.has(skinName)) {
+            // Скин уже куплен — активируем его
+            currentSkin = skinName;
+
+            // Сохраняем в localStorage
+            localStorage.setItem('selectedSkin', skinName);
+
+            // Обновляем сервер
+            fetch('/update-user-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login: currentUserLogin, currentSkin }),
+            }).then(() => updateSkinsUI())
+              .catch(err => console.error('Ошибка обновления текущего скина:', err));
+        } else {
+            // Покупаем скин
+            fetch('/users.json')
+                .then(response => response.json())
+                .then(users => {
+                    const user = users.find(u => u.login === currentUserLogin);
+
+                    if (!user) return console.error('Пользователь не найден');
+                    if (user.coins < 3) {
+                        return alert('Недостаточно монет для покупки скина');
+                    }
+
+                    userSkins.add(skinName);
+                    user.coins -= 3;
+                    
+
+                    // Сохраняем в localStorage
+                    localStorage.setItem('selectedSkin', skinName);
+
+                    fetch('/update-user-data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            login: currentUserLogin,
+                            skins: Array.from(userSkins),
+                            coins: user.coins,
+                        }),
+                    }).then(() => updateSkinsUI())
+                      .catch(err => console.error('Ошибка покупки скина:', err));
+
+                      updateCoins(user.coins);
+                });
+
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const collectionBtn = document.querySelector('.collection-button');
+    const collectionWindow = document.querySelector('.collection-window-1');
+    const overlayBackground = document.querySelector('.overlay-background-1');
+
+    if (collectionBtn && collectionWindow && overlayBackground) {
+        collectionBtn.addEventListener('click', () => {
+            collectionWindow.classList.toggle('active');
+            overlayBackground.classList.toggle('active');
+        });
+
+        overlayBackground.addEventListener('click', () => {
+            collectionWindow.classList.remove('active');
+            overlayBackground.classList.remove('active');
+        });
+    } 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const customSkinsContainer = document.querySelector('.custom-skins');
+    const defaultSkinsContainer = document.querySelector('.default-skins');
+    const addSkinContainer = document.querySelector('.add-skin');
+    const saveAddedBtn = document.querySelector('.save-added-btn');
+
+    // Проверяем, что все элементы существуют
+    if (customSkinsContainer && defaultSkinsContainer && addSkinContainer && saveAddedBtn) {
+        const skinsContainer = document.querySelector('.collection-window-1');
+
+        skinsContainer.addEventListener('click', (e) => {
+            const skinElement = e.target.closest('.skin');
+            if (!skinElement) return;
+
+            // Проверяем, является ли это кастомным скином
+            if (skinElement.classList.contains('my-skin-1') || 
+                skinElement.classList.contains('my-skin-2') || 
+                skinElement.classList.contains('my-skin-3')) {
+
+                // Проверка, куплен ли скин (на нём нет overlay)
+                const overlay = skinElement.querySelector('.skin-overlay');
+                if (!overlay || overlay.style.display === 'none') {
+                    // Скрываем default и custom skins
+                    customSkinsContainer.style.display = 'none';
+                    defaultSkinsContainer.style.display = 'none';
+
+                    // Показываем add-skin
+                    addSkinContainer.style.display = 'flex';
+                }
+            }
+        });
+
+        saveAddedBtn.addEventListener('click', () => {
+            // При нажатии на кнопку "Сохранить"
+            addSkinContainer.style.display = 'none'; // Скрываем add-skin
+            customSkinsContainer.style.display = 'flex'; // Показываем custom-skins
+            defaultSkinsContainer.style.display = 'flex'; // Показываем default-skins
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const addSkinButtons = document.querySelectorAll('.add'); // Найти все кнопки с классом add
+    const fileInput = document.createElement('input'); // Создаем input для выбора файла
+    fileInput.type = 'file';
+    fileInput.accept = 'image/png'; // Только PNG-файлы
+
+    addSkinButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            fileInput.click(); // Имитируем клик по input
+        });
+    });
+
+    fileInput.addEventListener('change', async () => {
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+
+            const formData = new FormData();
+            formData.append('skin', file);
+
+            try {
+                const response = await fetch('/upload-skin', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    alert(`Скин успешно загружен! Путь: ${result.path}`);
+                } else {
+                    const error = await response.text();
+                    alert(`Ошибка загрузки: ${error}`);
+                }
+            } catch (err) {
+                alert(`Произошла ошибка: ${err.message}`);
+            }
+        }
+    });
+});
+
+
+
+function updateCoins(coins) {
+    console.log('Обновляем монеты на странице:', coins);
+    const coinsElements = document.querySelectorAll('.coins-p'); // Элементы для отображения монет
+    if (coinsElements.length === 0) {
+        console.error('Элемент для отображения монет не найден');
+        return;
+    }
+
+    coinsElements.forEach(el => {
+        el.textContent = `${coins}`; // Обновляем текст
+    });
+}
+

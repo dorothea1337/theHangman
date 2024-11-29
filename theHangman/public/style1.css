@@ -16,7 +16,9 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    background-color: white;
 }
+
 
 .header {
     font-family: 'Melectron';
@@ -30,11 +32,7 @@ body {
 }
 
 .h1{
-    cursor: pointer;
-}
-
-.h1:hover{
-    color: #757272;
+    cursor: default;
 }
 
 .header-right {
@@ -109,6 +107,104 @@ body {
 
 .profile-window-1.active {
     display: flex;
+}
+
+.collection-window-1{
+    width: 600px;
+    height: 525px;
+    padding: 25px;
+    border: 1px solid black;
+    border-radius: 20px;
+    background-color: white;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+
+    position: absolute;
+    z-index: 10;
+    top: 23%;
+    left: 5%;
+}
+
+.collection-window-1.active{
+    display: flex;
+}
+
+.skins {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+}
+
+.skin {
+    width: 150px;
+    height: 220px;
+    padding-top: 10px;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    position: relative;
+}
+
+.my-skin-1{
+    width: 500px;
+    height: 220px;
+    padding-top: 10px;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    position: relative;
+}
+
+.skin-overlay {
+    background-color: #757272;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.skin-img{
+    height: 160px;
+    width: auto;
+}
+
+.skin-custom {
+    cursor: pointer;
+}
+
+.add-skin {
+    display: none;
+    flex-direction: column;
+}
+
+.add-skin.active {
+    display: flex;
+}
+
+.add {
+    cursor: pointer;
+}
+
+.save-added-btn {
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
 }
 
 .coins-box{
