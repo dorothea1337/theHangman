@@ -23,6 +23,13 @@
             <p class="register button" onclick="register()">Зарегистрироваться</p>
         </div>
     </div>
+    <div id="popup" class="hidden">
+        <div class="popup-content">
+            <p>Вы успешно зарегистрировались! Теперь войдите в систему.</p>
+            <p onclick="closePopup()">OK</p>
+        </div>
+    </div>
+    
     <p id="status-message"></p>
     <script>
         async function login() {
@@ -49,27 +56,39 @@
         }
 
         async function register() {
-            const login = document.getElementById('login-input').value;
-            const password = document.getElementById('password-input').value;
+        const login = document.getElementById('login-input').value;
+        const password = document.getElementById('password-input').value;
 
-            try {
-                const response = await fetch('/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ login, password })
-                });
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login, password })
+            });
 
-                if (response.ok) {
-                    window.location.href = '/index'; // Перенаправление на index.html
-                } else {
-                    const errorMessage = await response.text();
-                    document.getElementById('status-message').textContent = errorMessage;
-                }
+            if (response.ok) {
+                showPopup(); // Показываем сообщение о регистрации
+            } else {
+                const errorMessage = await response.text();
+                document.getElementById('status-message').textContent = errorMessage;
+            }
             } catch (error) {
                 console.error('Ошибка регистрации:', error);
                 document.getElementById('status-message').textContent = 'Ошибка сервера. Попробуйте позже.';
             }
+        
         }
+
+        function showPopup() {
+        const popup = document.getElementById('popup');
+        popup.classList.remove('hidden');
+    }
+
+    // Функция для закрытия всплывающего окна
+    function closePopup() {
+        const popup = document.getElementById('popup');
+        popup.classList.add('hidden');
+    }
     </script>
 </body>
 </html>

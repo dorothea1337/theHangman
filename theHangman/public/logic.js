@@ -48,7 +48,13 @@ async function loadUserDataByLogin(login) {
 
         if (user) {
             currentUser = user; // Сохраняем найденного пользователя
-            updateCoins(user.coins); // Обновляем монеты
+            console.log('Найденные элементы username:', document.querySelectorAll('.username'));
+            updateCoins(user.coins); 
+            updateHints(user.hints);
+
+            console.log('Найденные элементы username:', document.querySelectorAll('.username'));
+
+            updateUName(user.login);// Обновляем монеты
         } else {
             console.error('Пользователь с таким логином не найден');
         }
@@ -68,6 +74,18 @@ function updateCoins(coins) {
 
     coinsElements.forEach(el => {
         el.textContent = `${coins}`; // Обновляем текст
+    });
+}
+
+function updateUName(uname){
+    const unameElements = document.querySelectorAll('.username');
+    if (unameElements.length === 0) {
+        console.error('Элемент для отображения uname не найден');
+        return;
+    }
+
+    unameElements.forEach(el => {
+        el.textContent = `${localStorage.getItem('currentLogin')}`; // Обновляем текст
     });
 }
 
@@ -127,7 +145,7 @@ function createPlayground(symbol, parentElementId, count) {
     const parent = document.getElementById(parentElementId);
 
     if (parent.querySelectorAll('.empty-field').length === 0) {
-        for (let i = 0; i < count - 1; i++) {
+        for (let i = 0; i < count-1; i++) {
             const newElement = document.createElement('span');
             newElement.textContent = symbol;
             newElement.className = 'empty-field';
@@ -340,6 +358,7 @@ async function loadUserDataByLogin(login) {
             currentUser = user; // Сохраняем найденного пользователя
             updateCoins(user.coins);
             updateHints(user.hints); 
+            updateUName(user.login);
         } else {
             console.error('Пользователь с таким логином не найден');
         }
@@ -704,45 +723,54 @@ function addGameResultToUser(result, word = null) {
         return;
     }
 
-    // Создаём запись для recentGames
+    // Создаем запись для игры
     const gameRecord = {
         result: result, // "поражение" или "победа"
         word: word, // Загаданное слово, если победа
         timestamp: new Date().toISOString() // Время завершения игры
     };
 
-    // Если recentGames ещё нет, инициализируем его как пустой массив
-    if (!currentUser.recentGames) {
-        currentUser.recentGames = [];
-    }
-
     // Добавляем новую запись в начало массива и ограничиваем размер до 5
     currentUser.recentGames = [gameRecord, ...currentUser.recentGames].slice(0, 5);
 
+    console.log('Recent games:', currentUser.recentGames);
+
+    // Отправляем данные на сервер
     saveUserData(currentUser);
 }
 
 function saveUserData(user) {
-    // Пример сохранения данных пользователя (на сервере)
-    fetch('/update-user-data', {
+    // Проверка: убедитесь, что все обязательные данные передаются в запросе
+    if (!user.login || !user.recentGames || user.recentGames.length === 0) {
+        console.error('Ошибка: Недостаточно данных для сохранения.');
+        return;
+    }
+
+    // Формируем объект данных для отправки
+    const dataToSend = {
+        login: user.login,                // Логин пользователя
+        result: user.recentGames[0].result, // Результат последней игры
+        word: user.recentGames[0].word     // Загаданное слово (если есть)
+    };
+
+    fetch('http://localhost:3000/update-user-games', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(dataToSend), // Отправляем только нужные данные
     })
-        .then(response => {
-            if (response.ok) {
-                console.log('Данные пользователя успешно сохранены.');
-            } else {
-                console.error('Ошибка при сохранении данных пользователя.');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка сети при сохранении данных пользователя:', error);
-        });
+    .then(response => {
+        if (response.ok) {
+            console.log('Данные успешно сохранены.');
+        } else {
+            console.error('Ошибка при сохранении данных. Статус: ', response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Ошибка при отправке данных:', error);
+    });
 }
-
 function showGameOverPopup(){
     const overlay = document.getElementById('overlay-defeat');
     overlay.classList.remove('hidden-victory');
@@ -839,7 +867,7 @@ function showVictoryPopup() {
         loadRecentGames();
     } else {
         console.warn('Текущий пользователь не найден. Невозможно начислить подсказки, монеты и очки.');
-    }
+    }   
 }
 
 
@@ -940,6 +968,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+setInterval(loadRecentGames, 5000);
 
 // Функция для загрузки истории игр пользователя
 function loadRecentGames() {
@@ -1313,3 +1343,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+

@@ -2,9 +2,19 @@
   {
     "login": "drth",
     "password": "1111",
-    "hints": 26,
-    "coins": 17,
+    "hints": 29,
+    "coins": 20,
     "recentGames": [
+      {
+        "result": "победа",
+        "word": "дивиденд\r",
+        "timestamp": "2024-11-29T12:37:40.335Z"
+      },
+      {
+        "result": "победа",
+        "word": "термодинамика\r",
+        "timestamp": "2024-11-29T12:37:18.941Z"
+      },
       {
         "result": "победа",
         "word": "феминистка\r",
@@ -19,19 +29,9 @@
         "result": "победа",
         "word": "ефрейтор\r",
         "timestamp": "2024-11-25T22:45:39.081Z"
-      },
-      {
-        "result": "победа",
-        "word": "указание\r",
-        "timestamp": "2024-11-25T22:43:28.719Z"
-      },
-      {
-        "result": "победа",
-        "word": "табличка\r",
-        "timestamp": "2024-11-25T22:41:24.333Z"
       }
     ],
-    "score": 50,
+    "score": 62,
     "skins": [
       "blue",
       "default",
@@ -44,8 +44,8 @@
   {
     "login": "ghost",
     "password": "0000",
-    "hints": 4,
-    "coins": 1,
+    "hints": 6,
+    "coins": 4,
     "recentGames": [
       {
         "result": "победа",
@@ -68,7 +68,7 @@
         "timestamp": "2024-11-28T10:08:15.472Z"
       }
     ],
-    "score": 8,
+    "score": 15,
     "skins": [
       "blue",
       "default",
@@ -90,16 +90,21 @@
   {
     "login": "qwerty",
     "password": "qwerty",
-    "hints": 4,
-    "coins": 3,
+    "hints": 5,
+    "coins": 4,
     "recentGames": [
+      {
+        "result": "победа",
+        "word": "табличка\r",
+        "timestamp": "2024-11-29T12:36:33.386Z"
+      },
       {
         "result": "победа",
         "word": "преувеличивать\r",
         "timestamp": "2024-11-24T18:22:44.407Z"
       }
     ],
-    "score": 10,
+    "score": 11,
     "skins": [],
     "currentSkin": "default"
   },
@@ -112,5 +117,27 @@
     "score": 0,
     "skins": [],
     "currentSkin": "default"
+  },
+  {
+    "login": "mu",
+    "password": "mu",
+    "hints": 3,
+    "coins": 2,
+    "recentGames": [],
+    "score": 0,
+    "skins": [],
+    "currentSkin": "default"
+  },
+  {
+    "login": "jjj",
+    "password": "jjj",
+    "hints": 4,
+    "coins": 1,
+    "recentGames": [],
+    "score": 2,
+    "skins": [
+      "blue"
+    ],
+    "currentSkin": "blue"
   }
 ]

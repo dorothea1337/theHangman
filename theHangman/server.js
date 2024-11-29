@@ -172,6 +172,51 @@ app.post('/update-user-data', (req, res) => {
     });
 });
 
+app.post('/update-user-games', (req, res) => {
+    const { login, result, word } = req.body;
+
+    // Проверка, что все необходимые данные переданы
+    if (!login || typeof result === 'undefined') {
+        return res.status(400).json({ error: 'Необходимо передать логин и результат игры.' });
+    }
+
+    const users = readUsers();
+    const userIndex = users.findIndex(user => user.login === login);
+
+    if (userIndex === -1) {
+        return res.status(404).json({ error: 'Пользователь не найден.' });
+    }
+
+    const user = users[userIndex];
+
+    // Создаём запись для игры
+    const gameRecord = {
+        result: result, // "поражение" или "победа"
+        word: word || null, // Загаданное слово, если победа
+        timestamp: new Date().toISOString() // Время завершения игры
+    };
+
+    // Если у пользователя нет истории игр, создаем ее
+    if (!user.recentGames) {
+        user.recentGames = [];
+    }
+
+    // Добавляем новую запись в начало массива и ограничиваем размер до 5
+    user.recentGames = [gameRecord, ...user.recentGames].slice(0, 5);
+
+    // Сохраняем обновленные данные пользователя
+    users[userIndex] = user;
+
+    writeUsers(users); // Функция записи пользователей в файл
+
+    res.status(200).json({
+        message: 'История игр успешно обновлена.',
+        user: user // возвращаем актуальные данные пользователя
+    });
+});
+
+
+
 app.get('/leaders', (req, res) => {
     fs.readFile(leadersFilePath, 'utf8', (err, data) => {
         if (err) {

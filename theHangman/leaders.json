@@ -1,22 +1,30 @@
 [
   {
     "login": "drth",
-    "score": 50
+    "score": 62
+  },
+  {
+    "login": "ghost",
+    "score": 15
   },
   {
     "login": "qwerty",
-    "score": 10
+    "score": 11
   },
   {
     "login": "1",
     "score": 9
   },
   {
-    "login": "ghost",
-    "score": 8
+    "login": "jjj",
+    "score": 2
   },
   {
     "login": "2",
+    "score": 0
+  },
+  {
+    "login": "mu",
     "score": 0
   }
 ]
